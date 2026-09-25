@@ -1,0 +1,13 @@
+# Tutto ciò che sta in storage/ è locale a questa installazione: MAI in git.
+# (Ripetuto qui oltre al .gitignore principale, così vale anche se quello si perde.)
+*
+!.gitignore
+!.htaccess
+!README.md
+!settings.example.json
+!cache/
+!logs/
+cache/*
+logs/*
+!cache/.gitkeep
+!logs/.gitkeep

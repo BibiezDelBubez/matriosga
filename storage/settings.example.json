@@ -1,0 +1,21 @@
+{
+    "connection": {
+        "server": "SRVSQL01\\ISTANZA",
+        "port": "",
+        "database": "SGA",
+        "auth": "sql",
+        "username": "matriosga_reader",
+        "schema": "dbo",
+        "login_timeout": 10,
+        "query_timeout": 30,
+        "encrypt": true,
+        "trust_server_certificate": true,
+        "read_uncommitted": true
+    },
+    "limits": {
+        "search_batch_tables": 20,
+        "search_max_table_rows": 5000000,
+        "preview_rows": 50,
+        "page_size": 100
+    }
+}

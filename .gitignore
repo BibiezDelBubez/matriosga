@@ -1,0 +1,10 @@
+# Configurazione locale, segreti e dati generati: mai versionare
+# (storage/ ha anche un suo .gitignore con le stesse regole)
+storage/settings.json
+storage/secrets.json
+storage/app.key
+storage/*.key
+storage/cache/*
+storage/logs/*
+!storage/cache/.gitkeep
+!storage/logs/.gitkeep

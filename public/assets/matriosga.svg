@@ -1,0 +1,143 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 650" width="100%" height="100%">
+  <defs>
+    <!-- Ombreggiatura morbida per dare profondità alle matrioske -->
+    <filter id="drop-shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000000" flood-opacity="0.35"/>
+    </filter>
+    <filter id="inner-shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000000" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <!-- Sfondo dark per la Landing Page -->
+  <rect width="500" height="650" rx="24" fill="#0F172A"/>
+
+  <!-- ========================================== -->
+  <!-- LEVEL 1: MATRIOSKA ESTERNA - IL DATABASE   -->
+  <!-- ========================================== -->
+  <g filter="url(#drop-shadow)">
+    <!-- Sagoma Matrioska Esterna -->
+    <path d="M 250 50 
+             C 305 50, 340 85, 340 140 
+             C 340 175, 315 200, 310 220 
+             C 390 270, 410 380, 410 460 
+             C 410 540, 340 570, 250 570 
+             C 160 570, 90 540, 90 460 
+             C 90 380, 110 270, 190 220 
+             C 185 200, 160 175, 160 140 
+             C 160 85, 195 50, 250 50 Z" 
+          fill="#1E293B" stroke="#38BDF8" stroke-width="4"/>
+    
+    <!-- TESTA 1: CILINDRO DATABASE SQL -->
+    <g transform="translate(250, 135)">
+      <!-- Cilindro SQL Base -->
+      <path d="M -30 -15 L -30 15 C -30 25, 30 25, 30 15 L 30 -15" fill="none" stroke="#38BDF8" stroke-width="3.5"/>
+      <path d="M -30 -0 C -30 10, 30 10, 30 -0" fill="none" stroke="#38BDF8" stroke-width="3"/>
+      <ellipse cx="0" cy="-15" rx="30" ry="10" fill="#0F172A" stroke="#38BDF8" stroke-width="3.5"/>
+    </g>
+  </g>
+
+  <!-- ========================================== -->
+  <!-- LEVEL 2: MATRIOSKA INTERMEDIA - LA TABELLA -->
+  <!-- ========================================== -->
+  <g filter="url(#drop-shadow)">
+    <!-- Sagoma Matrioska Intermedia -->
+    <path d="M 250 200 
+             C 290 200, 315 225, 315 260 
+             C 315 285, 298 302, 294 315 
+             C 350 350, 365 425, 365 480 
+             C 365 535, 315 550, 250 550 
+             C 185 550, 135 535, 135 480 
+             C 135 425, 150 350, 206 315 
+             C 202 302, 185 285, 185 260 
+             C 185 225, 210 200, 250 200 Z" 
+          fill="#0284C7" stroke="#7DD3FC" stroke-width="3"/>
+
+    <!-- TESTA 2: ICONA SCHEMA / STRUTTURA -->
+    <g transform="translate(250, 258)">
+      <circle cx="0" cy="0" r="22" fill="#0369A1"/>
+      <!-- Icona Tabella / Griglia Schema -->
+      <rect x="-11" y="-11" width="22" height="22" rx="3" fill="none" stroke="#FFFFFF" stroke-width="2"/>
+      <line x1="-11" y1="-3" x2="11" y2="-3" stroke="#FFFFFF" stroke-width="2"/>
+      <line x1="-3" y1="-3" x2="-3" y2="11" stroke="#FFFFFF" stroke-width="2"/>
+    </g>
+
+    <!-- BUSTO 2: GRIGLIA TABELLA DATI (RIGHE E COLONNE) -->
+    <g transform="translate(250, 390)">
+      <!-- Sfondo Scheda Tabella -->
+      <rect x="-85" y="-55" width="170" height="100" rx="8" fill="#0F172A" stroke="#38BDF8" stroke-width="2.5" opacity="0.95"/>
+      
+      <!-- Header Tabella -->
+      <path d="M -85 -47 C -85 -51, -81 -55, -77 -55 L 77 -55 C 81 -55, 85 -51, 85 -47 L 85 -25 L -85 -25 Z" fill="#0369A1"/>
+      <circle cx="-70" cy="-40" r="3.5" fill="#38BDF8"/>
+      <rect x="-60" y="-43" width="50" height="6" rx="3" fill="#FFFFFF"/>
+      
+      <!-- Righe della Tabella SQL -->
+      <!-- Riga 1 (PK Highlighted) -->
+      <rect x="-75" y="-17" width="150" height="16" rx="4" fill="#1E293B"/>
+      <circle cx="-65" cy="-9" r="3" fill="#F59E0B"/> <!-- PK Icon Dot -->
+      <rect x="-55" y="-12" width="45" height="6" rx="3" fill="#38BDF8"/>
+      <rect x="0" y="-12" width="30" height="6" rx="3" fill="#94A3B8"/>
+      <rect x="40" y="-12" width="25" height="6" rx="3" fill="#94A3B8"/>
+
+      <!-- Riga 2 -->
+      <line x1="-75" y1="7" x2="75" y2="7" stroke="#334155" stroke-width="1.5"/>
+      <rect x="-55" y="1" width="35" height="6" rx="3" fill="#64748B"/>
+      <rect x="0" y="1" width="45" height="6" rx="3" fill="#64748B"/>
+
+      <!-- Riga 3 -->
+      <line x1="-75" y1="25" x2="75" y2="25" stroke="#334155" stroke-width="1.5"/>
+      <rect x="-55" y="19" width="50" height="6" rx="3" fill="#64748B"/>
+      <rect x="10" y="19" width="30" height="6" rx="3" fill="#64748B"/>
+    </g>
+  </g>
+
+  <!-- ========================================== -->
+  <!-- LEVEL 3: MATRIOSKA INTERNA - IL CAMPO/PK   -->
+  <!-- ========================================== -->
+  <g filter="url(#drop-shadow)">
+    <!-- Sagoma Matrioska Interna -->
+    <path d="M 250 380 
+             C 275 380, 290 395, 290 415 
+             C 290 430, 280 440, 277 450 
+             C 310 470, 320 515, 320 535 
+             C 320 545, 290 550, 250 550 
+             C 210 550, 180 545, 180 535 
+             C 180 515, 190 470, 223 450 
+             C 220 440, 210 430, 210 415 
+             C 210 395, 225 380, 250 380 Z" 
+          fill="#F59E0B" stroke="#FDE047" stroke-width="2.5"/>
+
+    <!-- TESTA 3: ICONA CHIAVE PRIMARIA (PK) -->
+    <g transform="translate(250, 418)">
+      <circle cx="0" cy="0" r="14" fill="#D97706"/>
+      <!-- Icona Chiave SQL -->
+      <circle cx="-3" cy="-3" r="4.5" fill="none" stroke="#FFFFFF" stroke-width="2"/>
+      <path d="M 0 0 L 6 6 M 4 4 L 6 2 M 5 5 L 7 3" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/>
+    </g>
+
+    <!-- BUSTO 3: NODO CAMPO E VALORE / RELAZIONE -->
+    <g transform="translate(250, 495)">
+      <!-- Scheda Campo Selezionato -->
+      <rect x="-45" y="-28" width="90" height="42" rx="6" fill="#0F172A" stroke="#FDE047" stroke-width="2"/>
+      
+      <!-- Label Campo -->
+      <text x="0" y="-12" fill="#FDE047" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="9" font-weight="bold" text-anchor="middle">
+        ID_COLUMN
+      </text>
+      
+      <!-- Grafico di Relazione / Connessione dei Dati -->
+      <line x1="-25" y1="6" x2="25" y2="6" stroke="#64748B" stroke-width="2" stroke-dasharray="3,3"/>
+      <circle cx="-25" cy="6" r="4" fill="#38BDF8"/>
+      <circle cx="0" cy="6" r="4" fill="#F59E0B"/>
+      <circle cx="25" cy="6" r="4" fill="#10B981"/>
+    </g>
+  </g>
+
+  <!-- ========================================== -->
+  <!-- TYPOGRAPHY: MATRIOSGA                      -->
+  <!-- ========================================== -->
+  <text x="250" y="615" fill="#FFFFFF" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif" font-size="26" font-weight="800" letter-spacing="6" text-anchor="middle">
+    MATRIOSGA
+  </text>
+</svg>

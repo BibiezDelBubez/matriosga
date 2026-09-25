@@ -1,0 +1,5 @@
+# Fine riga uniformi nel repository (LF); binari mai modificati.
+* text=auto eol=lf
+*.woff2 binary
+*.png binary
+*.jpg binary
