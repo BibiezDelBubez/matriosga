@@ -50,6 +50,21 @@ final class TableDataService
         ];
     }
 
+    /**
+     * Esegue una SELECT già costruita e validata (es. dal costruttore di query) e formatta le celle.
+     * @param array<string, mixed> $params
+     * @return array{columns: list<array{name: string, type: string}>, rows: list<list<mixed>>, limit: int}
+     */
+    public function run(string $sql, array $params, int $limit): array
+    {
+        $raw = $this->db->select($sql, $params);
+        return [
+            'columns' => array_map(static fn ($name) => ['name' => (string) $name, 'type' => ''], array_keys($raw[0] ?? [])),
+            'rows'    => array_map(fn (array $r) => array_map([$this, 'cell'], array_values($r)), $raw),
+            'limit'   => $limit,
+        ];
+    }
+
     private function expression(Column $c): string
     {
         $col = 't.' . $c->quoted();

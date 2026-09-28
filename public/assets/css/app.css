@@ -246,6 +246,14 @@ th[data-dir="desc"]::after { content: " ▼"; font-size: .7em; }
 .spy-pulse { font-size: 2.2rem; color: #198754; animation: spy-pulse 1.6s ease-in-out infinite; }
 @keyframes spy-pulse { 50% { opacity: .35; } }
 
+/* Costruttore di query */
+.step-num { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--mt-accent); color: #fff; font-size: .75rem; margin-right: .35rem; }
+.b-table { border-top: 1px solid var(--mt-border); padding: .75rem 1rem; }
+.b-via { margin: .35rem 0 0 .2rem; padding-left: .6rem; border-left: 3px solid #a9ccf7; }
+.b-col-list { max-height: 210px; overflow-y: auto; overflow-x: hidden; columns: 2; column-gap: 1rem; font-size: .8rem; }
+.b-col { display: block; break-inside: avoid; padding: 1px 0; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nav-sm .nav-link { padding: .25rem .7rem; font-size: .85rem; }
+
 /* Griglia dati */
 .data-grid { max-height: 60vh; overflow: auto; }
 .data-grid table { font-size: .8rem; }

@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 use App\Controllers\AnalysisController;
+use App\Controllers\BuilderController;
 use App\Controllers\ColumnsController;
 use App\Controllers\DashboardController;
 use App\Controllers\PathController;
@@ -29,6 +30,10 @@ return static function (Router $r): void {
     $r->get('/analysis', [AnalysisController::class, 'index']);
     $r->get('/api/analysis', [AnalysisController::class, 'data']);
     $r->get('/path', [PathController::class, 'index']);
+    $r->get('/builder', [BuilderController::class, 'index']);
+    $r->post('/api/builder/connect', [BuilderController::class, 'connect']);
+    $r->post('/api/builder/sql', [BuilderController::class, 'sql']);
+    $r->post('/api/builder/preview', [BuilderController::class, 'preview']);
     $r->get('/spy', [SpyController::class, 'index']);
     $r->get('/api/spy/state', [SpyController::class, 'state']);
     $r->post('/api/spy/start', [SpyController::class, 'start']);

@@ -62,6 +62,7 @@ Documenti da leggere prima di lavorare:
 | Tabelle vuote / copie di sicurezza da nascondere | `App\Services\TableFilterService` + `Controller::noiseFilter()` + `partials/show_all.php` (parametro `?all=1`). **Ogni nuova lista di tabelle/relazioni deve usarlo** |
 | Query di SGA (viste, funzioni, trigger nel DB) | `App\Services\SqlModuleService` (serve permesso VIEW DEFINITION) |
 | Spia modifiche (conteggi prima/dopo, rowversion, colonne data/utente configurabili) | `App\Services\SpyService`; nomi colonne in `config/app.php` → `spy` |
+| Costruttore di query (spec → SQL validato, anteprima) | `App\Services\QueryBuilderService`; collegamento tabelle `PathFinderService::connect()`; esecuzione `TableDataService::run()` |
 
 **Generico SQL Server**: le funzioni non devono dipendere da convenzioni di SGA. Solo meccanismi standard
 (sys.*, FK, rowversion, conteggi); se serve una convenzione di nomi, renderla configurabile in `config/app.php`.

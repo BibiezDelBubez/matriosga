@@ -85,8 +85,11 @@ Se una sessione si interrompe: riprendere dal primo passo non spuntato.
       rowversion (@@DBTS), colonne data/utente configurabili (config spy). Filtro facoltativo per utente.
       Su Sgam2: 342 tabelle controllabili riga per riga in ~9 s. Nessun permesso extra richiesto
 - [-] 6.5 Decodifica codici — **sospesa (28/09/2026)**: l'utente vuole funzioni generiche, non basate su come SGA salva le descrizioni
-- [ ] 6.6 **Costruttore di query multi-tabella** (richiesto con entusiasmo): scegli tabelle → percorso automatico →
-      scegli colonne → un'unica SELECT con JOIN + Power Query
+- [x] 6.6 **Costruttore di query** (`/builder`, `QueryBuilderService`, `PathFinderService::connect`, `js/builder.js`):
+      aggiungi tabelle → collegamento automatico al gruppo (tabelle ponte aggiunte da sole, fino a 6 percorsi alternativi),
+      LEFT/INNER per join, colonne spuntabili, filtri (=, <>, >, <, contiene, inizia, NULL), SQL + Power Query + anteprima 50 righe.
+      Dal browser arriva solo una descrizione (spec), l'SQL è costruito e validato sul server. Stato in localStorage.
+      Idee future: stessa tabella due volte (es. cliente e fornitore), salvare/ricaricare query con nome
 - [ ] 6.7 Idee restanti: Note personali, Recenti. Valutare nomi più generici per "Query di SGA" (es. "Query nel database")
 - [ ] 5.1 Controllo "nessun URL esterno" (grep), log durata query, pulizia
 - [ ] 5.2 Ottimizzazioni performance su DB reale (es. binding varchar vs nvarchar nei parametri per usare gli indici in modalità "uguale")

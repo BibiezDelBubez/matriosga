@@ -17,6 +17,9 @@ final class PathFinderService
 {
     private const MAX_EXPANSIONS = 200000; // freno di sicurezza contro esplosioni combinatorie
 
+    /** @var array<string, array> grafi già costruiti in questa richiesta (connect() chiama find() più volte) */
+    private array $graphs = [];
+
     public function __construct(private readonly RelationshipService $relations)
     {
     }
@@ -102,11 +105,57 @@ final class PathFinderService
     }
 
     /**
+     * Come collegare una tabella nuova a un gruppo di tabelle già scelte (costruttore di query).
+     * Percorsi dalla tabella nuova a ciascuna tabella del gruppo, tagliati alla prima tabella del gruppo
+     * incontrata e girati: ogni percorso parte da una tabella del gruppo e arriva alla nuova.
+     * @param list<string> $existing
+     * @return list<array> percorsi nel formato di find() (più corti prima)
+     */
+    public function connect(Catalog $catalog, string $new, array $existing, array $opt): array
+    {
+        $inGroup = array_flip($existing);
+        $all = [];
+        foreach ($existing as $target) {
+            foreach ($this->find($catalog, $new, $target, ['max' => 5] + $opt)['paths'] as $path) {
+                // taglio alla prima tabella del gruppo (il percorso può attraversarne un'altra prima di $target)
+                $steps = [];
+                foreach ($path['steps'] as $s) {
+                    $steps[] = $s;
+                    if (isset($inGroup[$s['b']])) {
+                        break;
+                    }
+                }
+                $reversed = array_map(static fn (array $s) => [
+                    'a' => $s['b'], 'b' => $s['a'], 'rel' => $s['rel'], 'forward' => !$s['forward'],
+                    'cols_a' => $s['cols_b'], 'cols_b' => $s['cols_a'],
+                ], array_reverse($steps));
+                $nodes = array_merge([$reversed[0]['a']], array_column($reversed, 'b'));
+                $all[implode('>', $nodes)] = [
+                    'nodes'      => $nodes,
+                    'steps'      => $reversed,
+                    'candidates' => count(array_filter($reversed, static fn ($s) => $s['rel']['kind'] === 'candidate')),
+                    'generic'    => $path['generic'],
+                ];
+            }
+        }
+        $all = array_values($all);
+        usort($all, static fn (array $a, array $b) => [count($a['steps']), $a['candidates'], $a['generic']] <=> [count($b['steps']), $b['candidates'], $b['generic']]);
+        return array_slice($all, 0, $opt['max']);
+    }
+
+    /**
      * Grafo non orientato: nodo => [vicino => relazione migliore]. Una FK dichiarata batte sempre
      * una candidata; fra candidate vince il punteggio più alto.
      * @return array{0: array<string, array<string, array>>, 1: array<string, int>}
      */
     private function graph(Catalog $catalog, bool $withCandidates, int $minScore): array
+    {
+        $key = ($withCandidates ? 'c' : 'f') . $minScore;
+        return $this->graphs[$key] ??= $this->buildGraph($catalog, $withCandidates, $minScore);
+    }
+
+    /** @return array{0: array<string, array<string, array>>, 1: array<string, int>} */
+    private function buildGraph(Catalog $catalog, bool $withCandidates, int $minScore): array
     {
         $adj = [];
         foreach ($this->relations->edges($catalog, $withCandidates, $minScore) as $rel) {

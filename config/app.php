@@ -112,6 +112,12 @@ return [
             'questions' => ['Queste due tabelle sono collegate? Da cosa?', 'Esiste un percorso tra la tabella A e la tabella B?'],
         ],
         [
+            'path' => '/builder', 'label' => 'Costruttore query', 'icon' => 'fa-screwdriver-wrench', 'home' => true, 'ready' => true,
+            'desc' => 'Scegli tabelle e colonne: SQL e Power Query con le JOIN giuste',
+            'keywords' => ['costruttore', 'query', 'crea query', 'join', 'unisci', 'più tabelle', 'power query', 'estrazione', 'select', 'report', 'dataset', 'modello'],
+            'questions' => ['Come creo una query che unisce più tabelle?', 'Mi dai la query pronta per Power BI?'],
+        ],
+        [
             'path' => '/spy', 'label' => 'Spia modifiche', 'icon' => 'fa-user-secret', 'home' => true, 'ready' => true,
             'desc' => 'Quali tabelle cambia il gestionale quando fai un\'operazione',
             'keywords' => ['spia', 'modifiche', 'cosa cambia', 'dove scrive', 'dove salva', 'traccia', 'prima dopo', 'operazione', 'inserimento', 'registrazione', 'nuove righe', 'monitor'],
