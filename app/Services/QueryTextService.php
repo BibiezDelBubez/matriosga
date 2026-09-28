@@ -105,14 +105,13 @@ final class QueryTextService
     }
 
     /**
-     * Power Query con query SQL nativa. L'SQL è scritto una riga per riga (Text.Combine), così resta
-     * leggibile e modificabile anche nell'Editor avanzato di Power BI.
+     * Power Query con query SQL nativa. L'SQL è un unico testo M su più righe (in M un testo tra
+     * virgolette può andare a capo): resta identico all'SQL e si può ricopiare in SSMS così com'è.
      */
     public function powerQueryNative(string $sql): string
     {
-        $lines = array_map(static fn (string $l) => '            ' . self::m($l), preg_split('/\R/', $sql) ?: [$sql]);
         return "let\n" . $this->mHeader() . "\n"
-            . "    Query = Text.Combine({\n" . implode(",\n", $lines) . "\n        }, \"#(lf)\"),\n"
+            . '    Query = "' . str_replace(['"', "\r\n"], ['""', "\n"], $sql) . "\",\n"
             . "    Source = Sql.Database(Server, Database, [Query = Query])\nin\n    Source";
     }
 
