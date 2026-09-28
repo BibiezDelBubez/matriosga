@@ -28,7 +28,7 @@ final class BuilderController extends Controller
             'title'     => 'Costruttore di query',
             'operators' => QueryBuilderService::OPERATORS,
             'noise'     => $this->noiseFilter($request, $this->cache->catalog()),
-            'scripts'   => ['js/builder.js'],
+            'scripts'   => ['js/relation-editor.js', 'js/builder.js'],
         ]);
     }
 

@@ -59,13 +59,14 @@ final class QueryBuilderService
         return array_map(static fn (array $p) => [
             'nodes'      => $p['nodes'],
             'candidates' => $p['candidates'],
+            'weak'       => $p['weak'],
             'steps'      => array_map(static fn (array $s) => [
                 'parent'      => $s['a'],
                 'child'       => $s['b'],
                 'cols_parent' => $s['cols_a'],
                 'cols_child'  => $s['cols_b'],
                 'kind'        => $s['rel']['kind'],
-                'label'       => $s['rel']['kind'] === 'fk' ? $s['rel']['name'] : 'candidata ' . $s['rel']['score'] . '%',
+                'label'       => $s['rel']['kind'] === 'candidate' ? 'candidata ' . $s['rel']['score'] . '%' : $s['rel']['name'],
             ], $p['steps']),
         ], $this->paths->connect($catalog, $new, $existing, $opt));
     }
@@ -90,7 +91,7 @@ final class QueryBuilderService
             foreach ($via['cols_parent'] as $i => $pc) {
                 $on[] = "{$alias}." . Sql::quoteIdent($via['cols_child'][$i]) . " = {$via['parent']}." . Sql::quoteIdent($pc);
             }
-            $note = $via['kind'] === 'candidate' ? '  -- relazione CANDIDATA (non FK): verificarla' : '';
+            $note = QueryTextService::kindComment($via['kind']);
             $from .= "\n{$via['join']} JOIN {$table->quoted()} AS {$alias}{$note}\n    ON " . implode("\n   AND ", $on);
         }
         $sql = 'SELECT' . ($top !== null ? " TOP ({$top})" : '') . "\n    " . implode(",\n    ", $select) . "\n" . $from
@@ -137,7 +138,7 @@ final class QueryBuilderService
                     'cols_parent' => array_map(fn ($c) => $this->column($parent[0], (string) $c)->name, $colsP),
                     'cols_child'  => array_map(fn ($c) => $this->column($table, (string) $c)->name, $colsC),
                     'join'        => ($v['join'] ?? 'LEFT') === 'INNER' ? 'INNER' : 'LEFT',
-                    'kind'        => ($v['kind'] ?? 'fk') === 'candidate' ? 'candidate' : 'fk',
+                    'kind'        => in_array($v['kind'] ?? 'fk', ['candidate', 'manual'], true) ? $v['kind'] : 'fk',
                 ];
             }
             $out[$alias] = [$table, $via];

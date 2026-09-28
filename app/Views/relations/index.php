@@ -1,6 +1,6 @@
 <?php
 /**
- * @var string $kind declared|candidates @var string $query @var ?string $from @var ?string $to @var bool $hubs
+ * @var string $kind declared|candidates|manual @var int $manualCount @var string $query @var ?string $from @var ?string $to @var bool $hubs
  * @var ?array $result @var array<int,string> $joins @var ?App\Helpers\Pager $pager @var int $total @var array<string,int> $hubList
  * @var array $noise Controller::noiseFilter()
  */
@@ -16,10 +16,13 @@ $tabUrl = static fn (string $k) => url('/relations', ['kind' => $k] + $keep);
 </div>
 
 <ul class="nav nav-tabs">
-    <li class="nav-item"><a class="nav-link<?= $candidates ? '' : ' active' ?>" href="<?= e($tabUrl('declared')) ?>">
+    <li class="nav-item"><a class="nav-link<?= $kind === 'declared' ? ' active' : '' ?>" href="<?= e($tabUrl('declared')) ?>">
         <span class="badge badge-fk">FK</span> Dichiarate <span class="badge text-bg-light border"><?= e(fmt_int($total)) ?></span></a></li>
     <li class="nav-item"><a class="nav-link<?= $candidates ? ' active' : '' ?>" href="<?= e($tabUrl('candidates')) ?>">
         <span class="badge badge-cand">?</span> Candidate</a></li>
+    <li class="nav-item"><a class="nav-link<?= $kind === 'manual' ? ' active' : '' ?>" href="<?= e($tabUrl('manual')) ?>">
+        <span class="badge badge-manual"><i class="fa-solid fa-user-pen"></i></span> Definite da te <span class="badge text-bg-light border"><?= e(fmt_int($manualCount)) ?></span></a></li>
+    <li class="nav-item ms-auto"><button type="button" class="btn btn-sm btn-success my-1" data-new-relation><i class="fa-solid fa-plus"></i> Nuova relazione</button></li>
 </ul>
 <div class="card border-top-0 rounded-top-0">
     <form class="card-body border-bottom" method="get" action="<?= e(url('/relations')) ?>">
@@ -59,7 +62,17 @@ $tabUrl = static fn (string $k) => url('/relations', ['kind' => $k] + $keep);
         </div>
     <?php endif; ?>
 
-    <?php if (!$candidates && $total === 0): ?>
+    <?php if ($kind === 'manual'): ?>
+        <div class="card-body py-2 small text-secondary border-bottom">
+            <i class="fa-solid fa-circle-info"></i> Collegamenti che conosci ma che il database non dichiara (es. una tabella ponte usata da sempre).
+            Salvati solo in questa installazione (<span class="ident">storage/relations.json</span>) e usati da Percorso, Grafo e Costruttore con priorità sulle FK.
+        </div>
+    <?php endif; ?>
+
+    <?php if ($kind === 'manual' && $manualCount === 0): ?>
+        <div class="empty-state"><i class="fa-solid fa-user-pen"></i>Nessuna relazione definita da te.<br>
+            <button type="button" class="btn btn-success mt-2" data-new-relation><i class="fa-solid fa-plus"></i> Nuova relazione</button></div>
+    <?php elseif ($kind === 'declared' && $total === 0): ?>
         <div class="empty-state"><i class="fa-solid fa-link-slash"></i>Il database non ha foreign key dichiarate: usa la scheda <strong>Candidate</strong>.</div>
     <?php elseif ($result === null): ?>
         <div class="card-body">
@@ -77,7 +90,7 @@ $tabUrl = static fn (string $k) => url('/relations', ['kind' => $k] + $keep);
         <div class="empty-state"><i class="fa-solid fa-magnifying-glass"></i>Nessuna relazione trovata.</div>
     <?php else: ?>
         <div class="card-body py-2 d-flex flex-wrap gap-3 align-items-center border-bottom">
-            <div><strong><?= e(fmt_int($result['total'])) ?></strong> relazioni <?= $candidates ? 'candidate' : 'dichiarate' ?></div>
+            <div><strong><?= e(fmt_int($result['total'])) ?></strong> relazioni <?= ['candidates' => 'candidate', 'manual' => 'definite da te'][$kind] ?? 'dichiarate' ?></div>
             <div class="flex-grow-1" style="min-width: 240px">
                 <?= $this->partial('partials/filter_box', ['target' => '#rel-list', 'placeholder' => 'Filtra in questa pagina…']) ?>
             </div>
@@ -91,6 +104,8 @@ $tabUrl = static fn (string $k) => url('/relations', ['kind' => $k] + $keep);
                     <th data-sort>A (tabella.colonna)</th>
                     <?php if ($candidates): ?>
                         <th data-sort="num">Affidabilità</th><th>Perché</th>
+                    <?php elseif ($kind === 'manual'): ?>
+                        <th>Tipo</th><th>Nota</th>
                     <?php else: ?>
                         <th data-sort>Nome FK</th><th>Regole</th>
                     <?php endif; ?>
@@ -109,3 +124,5 @@ $tabUrl = static fn (string $k) => url('/relations', ['kind' => $k] + $keep);
             'query' => ['kind' => $kind, 'hubs' => $hubs ? 1 : null] + $keep]) ?>
     <?php endif; ?>
 </div>
+
+<?= $this->partial('partials/relation_editor') ?>

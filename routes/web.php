@@ -52,6 +52,9 @@ return static function (Router $r): void {
     $r->post('/api/search/rows', [SearchController::class, 'rows']);
     $r->get('/relations', [RelationsController::class, 'index']);
     $r->post('/api/relations/verify', [RelationsController::class, 'verify']);
+    $r->post('/api/relations/user', [RelationsController::class, 'addUser']);
+    $r->post('/api/relations/user/delete', [RelationsController::class, 'deleteUser']);
+    $r->get('/api/relations/suggest', [RelationsController::class, 'suggest']);
 
     $r->get('/settings', [SettingsController::class, 'index']);
     $r->post('/settings', [SettingsController::class, 'save']);

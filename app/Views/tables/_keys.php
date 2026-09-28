@@ -3,6 +3,7 @@
  * Scheda chiavi: PK, FK in uscita, FK in entrata (solo le prime: $fksIn).
  * @var App\Models\Table $table @var array $joinsOut @var array $joinsIn @var list<array> $fksIn @var int $fksInTotal
  * @var array $candOut @var array $candIn candidate {rows, total, joins} @var array $noise Controller::noiseFilter()
+ * @var array $manual relazioni definite dall'utente che toccano questa tabella {rows, joins}
  */
 $pk = $table->pk();
 $fksOut = $table->fksOut();
@@ -60,6 +61,24 @@ $fksOut = $table->fksOut();
             <?php if (!$fksIn): ?><p class="text-secondary small">Nessuna foreign key dichiarata in entrata.</p><?php endif; ?>
         </div>
     </div>
+
+    <h2 class="section-title mt-4 d-flex align-items-center gap-2">
+        <span class="badge badge-manual"><i class="fa-solid fa-user-pen"></i></span> Relazioni definite da te
+        <button type="button" class="btn btn-sm btn-outline-success ms-auto" data-new-relation data-from="<?= e($table->fullName) ?>"><i class="fa-solid fa-plus"></i> Nuova</button>
+    </h2>
+    <?php if ($manual['rows']): ?>
+        <div class="table-responsive mb-2">
+            <table class="table table-sm table-hover mb-0">
+                <tbody>
+                <?php foreach ($manual['rows'] as $i => $rel): ?>
+                    <?= $this->partial('partials/relation_row', ['rel' => $rel, 'join' => $manual['joins'][$i]]) ?>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    <?php else: ?>
+        <p class="small text-secondary">Nessuna. Usa «Nuova» se sai che questa tabella si collega a un'altra ma il database non lo dichiara.</p>
+    <?php endif; ?>
 
     <h2 class="section-title mt-4"><span class="badge badge-cand">?</span> Relazioni candidate
         <span class="small fw-normal text-secondary">— dedotte dai nomi delle colonne, <strong>non sono FK</strong>: verificale sui dati</span></h2>

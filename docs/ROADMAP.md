@@ -90,6 +90,10 @@ Se una sessione si interrompe: riprendere dal primo passo non spuntato.
       LEFT/INNER per join, colonne spuntabili, filtri (=, <>, >, <, contiene, inizia, NULL), SQL + Power Query + anteprima 50 righe.
       Dal browser arriva solo una descrizione (spec), l'SQL è costruito e validato sul server. Stato in localStorage.
       Idee future: stessa tabella due volte (es. cliente e fornitore), salvare/ricaricare query con nome
+- [x] 6.6b Dopo feedback sul costruttore: Power Query leggibile (Text.Combine, una riga SQL per riga);
+      percorsi "deboli" (A → X ← B tramite anagrafica comune) in fondo e segnalati; **relazioni definite dall'utente**
+      (Relazioni → Definite da te, dettaglio tabella, Costruttore «Collega a mano»), con coppie proposte e verifica dati.
+      Caso reale: T2ViaggiVettoriClienti.CLIENTE_* → T2ViaggiClienti (non dichiarata, 100% verificata) ora usata come ponte
 - [ ] 6.7 Idee restanti: Note personali, Recenti. Valutare nomi più generici per "Query di SGA" (es. "Query nel database")
 - [ ] 5.1 Controllo "nessun URL esterno" (grep), log durata query, pulizia
 - [ ] 5.2 Ottimizzazioni performance su DB reale (es. binding varchar vs nvarchar nei parametri per usare gli indici in modalità "uguale")

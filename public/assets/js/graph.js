@@ -35,6 +35,7 @@
                 'text-background-color': '#fff', 'text-background-opacity': 1, 'text-background-padding': '1px',
             } },
             { selector: 'edge[kind = "candidate"]', style: { 'line-style': 'dashed', 'line-color': '#b58ae6', 'target-arrow-color': '#b58ae6' } },
+            { selector: 'edge[kind = "manual"]', style: { 'line-color': '#3fa36a', 'target-arrow-color': '#3fa36a', 'width': 2.2 } },
             { selector: '.faded', style: { 'opacity': 0.12 } },
             { selector: 'node.hl', style: { 'border-width': 3, 'border-color': '#f59e0b' } },
             { selector: 'edge.hl', style: { 'width': 3.5, 'line-color': '#f59e0b', 'target-arrow-color': '#f59e0b', 'opacity': 1 } },
@@ -128,12 +129,12 @@
         const rels = d.rels.map(r => {
             const verify = JSON.stringify({ from: d.source, from_cols: r.from_cols, to: d.target, to_cols: r.to_cols });
             return `<div class="fk-card small">
-                <div class="mb-1">${d.kind === 'fk' ? `<span class="badge badge-fk">FK</span> <span class="ident text-secondary text-break">${E(r.name)}</span>` : `<span class="badge badge-cand">candidata ${r.score}%</span>`}</div>
+                <div class="mb-1">${Matriosga.relBadge(d.kind, r.name, r.score)}${d.kind === 'fk' ? ` <span class="ident text-secondary text-break">${E(r.name)}</span>` : ''}</div>
                 <div class="ident">(${E(r.from_cols.join(', '))})</div>
                 <div class="text-secondary"><i class="fa-solid fa-arrow-down"></i></div>
                 <div class="ident mb-1">(${E(r.to_cols.join(', '))})</div>
                 <button class="btn btn-sm btn-link p-0" data-copy="${E(r.join)}"><i class="fa-regular fa-copy"></i> JOIN</button>
-                ${d.kind === 'candidate' ? `<button class="btn btn-sm btn-outline-secondary py-0 ms-2" data-verify="${E(verify)}"><i class="fa-solid fa-vial"></i> Verifica</button>` : ''}
+                ${d.kind !== 'fk' ? `<button class="btn btn-sm btn-outline-secondary py-0 ms-2" data-verify="${E(verify)}"><i class="fa-solid fa-vial"></i> Verifica</button>` : ''}
             </div>`;
         }).join('');
         info.innerHTML = `<div class="mb-2">${link(d.source)}<div class="text-secondary"><i class="fa-solid fa-arrow-down"></i> punta a (${d.count} ${d.count === 1 ? 'relazione' : 'relazioni'})</div>${link(d.target)}</div>${rels}`;

@@ -88,10 +88,15 @@ $toggleUrl = static fn (array $change) => url('/path', array_merge([
         <div class="card mb-3 path-card">
             <div class="card-header d-flex flex-wrap align-items-center gap-2">
                 <span>Percorso <?= $i + 1 ?> · <?= count($path['steps']) ?> <?= count($path['steps']) === 1 ? 'passaggio' : 'passaggi' ?></span>
+                <?php if ($path['manual']): ?><span class="badge badge-manual"><?= $path['manual'] ?> definite da te</span><?php endif; ?>
                 <?php if ($path['candidates']): ?>
                     <span class="badge badge-cand"><?= $path['candidates'] ?> relazioni candidate</span>
-                <?php else: ?>
+                <?php elseif (!$path['manual']): ?>
                     <span class="badge badge-fk">solo FK dichiarate</span>
+                <?php endif; ?>
+                <?php if ($path['weak']): ?>
+                    <span class="badge text-bg-warning" title="Passa da una tabella a cui puntano entrambe (es. un'anagrafica o una configurazione): collega righe che hanno solo un valore in comune e di solito moltiplica le righe.">
+                        <i class="fa-solid fa-triangle-exclamation"></i> collegamento debole</span>
                 <?php endif; ?>
                 <span class="ms-auto d-flex gap-2">
                     <button type="button" class="btn btn-sm btn-outline-secondary" data-copy="<?= e($sql[$i]) ?>"><i class="fa-regular fa-copy"></i> SQL JOIN</button>
@@ -105,17 +110,17 @@ $toggleUrl = static fn (array $change) => url('/path', array_merge([
                 <?php foreach ($path['steps'] as $s): ?>
                     <?php $rel = $s['rel']; ?>
                     <div class="path-node"><?= $this->partial('partials/table_link', ['full' => $s['a']]) ?></div>
-                    <div class="path-edge<?= $rel['kind'] === 'candidate' ? ' is-candidate' : '' ?>">
+                    <div class="path-edge is-<?= e($rel['kind']) ?>">
                         <div class="ident small">
                             <?php foreach ($s['cols_a'] as $k => $col): ?>
                                 <div><?= e($col) ?> <span class="text-secondary">=</span> <?= e($s['cols_b'][$k]) ?></div>
                             <?php endforeach; ?>
                         </div>
                         <div class="small">
+                            <?= $this->partial('partials/rel_badge', ['rel' => $rel]) ?>
                             <?php if ($rel['kind'] === 'fk'): ?>
-                                <span class="badge badge-fk">FK</span> <span class="ident text-secondary"><?= e($rel['name']) ?></span>
+                                <span class="ident text-secondary"><?= e($rel['name']) ?></span>
                             <?php else: ?>
-                                <span class="badge badge-cand">candidata <?= e($rel['score']) ?>%</span>
                                 <button type="button" class="btn btn-sm btn-outline-secondary py-0" data-verify="<?= e(json_encode(['from' => $rel['from'], 'from_cols' => $rel['from_cols'], 'to' => $rel['to'], 'to_cols' => $rel['to_cols']])) ?>"><i class="fa-solid fa-vial"></i> Verifica</button>
                             <?php endif; ?>
                             <span class="text-secondary ms-1" title="Chi punta a chi"><?= $s['forward'] ? '↓ punta a' : '↑ è puntata da' ?></span>

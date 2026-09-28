@@ -18,6 +18,8 @@
                     <input class="form-control ident" id="b-table" data-table-picker placeholder="Scrivi il nome di una tabella…" autocomplete="off">
                     <button class="btn btn-primary" type="button" id="b-add"><i class="fa-solid fa-plus"></i> Aggiungi</button>
                 </div>
+                <div class="small mt-1">Il collegamento che conosci non viene trovato (es. una tabella ponte)?
+                    <button type="button" class="btn btn-link btn-sm p-0 align-baseline" id="b-manual"><i class="fa-solid fa-user-pen"></i> Collega a mano</button></div>
                 <div class="d-flex flex-wrap gap-3 mt-2 small">
                     <div class="form-check form-switch mb-0">
                         <input class="form-check-input" type="checkbox" role="switch" id="b-cand">
@@ -66,3 +68,5 @@
 </div>
 
 <script type="application/json" id="b-operators"><?= json_encode($operators, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG) ?></script>
+
+<?= $this->partial('partials/relation_editor') ?>

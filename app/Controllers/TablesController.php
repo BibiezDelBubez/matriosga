@@ -66,6 +66,7 @@ final class TablesController extends Controller
             'fksIn'      => $rel['fksIn'],
             'fksInTotal' => $rel['fksInTotal'],
             'joinsIn'    => $this->queryText->joins($catalog, $rel['fksIn']),
+            'manual'     => ['rows' => $rel['manual'], 'joins' => $this->queryText->joins($catalog, $rel['manual'])],
             'candOut'    => $rel['candOut'] + ['joins' => $this->queryText->joins($catalog, $rel['candOut']['rows'])],
             'candIn'     => $rel['candIn'] + ['joins' => $this->queryText->joins($catalog, $rel['candIn']['rows'])],
             'code'       => [
@@ -74,7 +75,7 @@ final class TablesController extends Controller
                 'pqNative' => $this->queryText->powerQueryNative($sql),
             ],
             'tab'        => $request->enum('tab', ['columns', 'keys', 'indexes', 'data', 'code'], 'columns'),
-            'scripts'    => ['js/table.js'],
+            'scripts'    => ['js/relation-editor.js', 'js/table.js'],
         ]);
     }
 

@@ -51,7 +51,9 @@ $tabs = [
 <div class="tab-content card border-top-0 rounded-top-0">
     <?php foreach (array_keys($tabs) as $key): ?>
         <div class="tab-pane fade<?= $tab === $key ? ' show active' : '' ?>" id="pane-<?= e($key) ?>" role="tabpanel">
-            <?= $this->partial('tables/_' . $key, compact('table', 'selected', 'joinsOut', 'joinsIn', 'fksIn', 'fksInTotal', 'code', 'candOut', 'candIn', 'noise')) ?>
+            <?= $this->partial('tables/_' . $key, compact('table', 'selected', 'joinsOut', 'joinsIn', 'fksIn', 'fksInTotal', 'code', 'candOut', 'candIn', 'noise', 'manual')) ?>
         </div>
     <?php endforeach; ?>
 </div>
+
+<?= $this->partial('partials/relation_editor') ?>

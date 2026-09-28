@@ -70,6 +70,14 @@
             return String(text).split(re).map((part, i) => i % 2 ? `<mark>${Matriosga.esc(part)}</mark>` : Matriosga.esc(part)).join('');
         },
 
+        /** Badge del tipo di relazione (stessa resa di partials/rel_badge.php). */
+        relBadge(kind, name = '', score = null) {
+            const E = Matriosga.esc;
+            if (kind === 'manual') return `<span class="badge badge-manual" title="${E(name)}"><i class="fa-solid fa-user-pen"></i> definita da te</span>`;
+            if (kind === 'candidate') return `<span class="badge badge-cand">candidata ${E(score ?? '')}%</span>`;
+            return `<span class="badge badge-fk" title="${E(name)}">FK</span>`;
+        },
+
         /** Blocco codice copiabile (stessa resa di partials/code_block.php). */
         codeBlock(title, code, icon = 'fa-code') {
             const E = Matriosga.esc;

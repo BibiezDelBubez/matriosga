@@ -41,6 +41,16 @@ final class QueryTextService
         return "SELECT\n    f.*,\n    p.*\nFROM {$catalog->quoted($fk['from'])} AS f\nLEFT JOIN {$catalog->quoted($fk['to'])} AS p\n    ON " . implode("\n   AND ", $on);
     }
 
+    /** Commento SQL accanto a una JOIN che non è una FK dichiarata. */
+    public static function kindComment(string $kind): string
+    {
+        return match ($kind) {
+            'candidate' => '  -- relazione CANDIDATA (non FK): verificarla',
+            'manual'    => '  -- relazione definita da te (non FK)',
+            default     => '',
+        };
+    }
+
     /**
      * JOIN per una lista di relazioni (stesso indice della lista).
      * @param list<array<string, mixed>> $relations
@@ -67,7 +77,7 @@ final class QueryTextService
             foreach ($s['cols_a'] as $k => $col) {
                 $on[] = "{$b}." . Sql::quoteIdent($s['cols_b'][$k]) . " = {$a}." . Sql::quoteIdent($col);
             }
-            $note = $s['rel']['kind'] === 'candidate' ? '  -- relazione CANDIDATA (non FK)' : '';
+            $note = self::kindComment($s['rel']['kind']);
             $sql .= "\nLEFT JOIN " . $catalog->quoted($s['b']) . " AS {$b}{$note}\n    ON " . implode("\n   AND ", $on);
         }
         return "SELECT\n    " . implode(",\n    ", $aliases) . "\n" . $sql;
@@ -94,10 +104,16 @@ final class QueryTextService
         return "let\n" . implode("\n", $steps) . "\nin\n    {$last}";
     }
 
-    /** Power Query con query SQL nativa. */
+    /**
+     * Power Query con query SQL nativa. L'SQL è scritto una riga per riga (Text.Combine), così resta
+     * leggibile e modificabile anche nell'Editor avanzato di Power BI.
+     */
     public function powerQueryNative(string $sql): string
     {
-        return "let\n" . $this->mHeader() . "\n    Source = Sql.Database(Server, Database, [Query = " . self::m($sql) . "])\nin\n    Source";
+        $lines = array_map(static fn (string $l) => '            ' . self::m($l), preg_split('/\R/', $sql) ?: [$sql]);
+        return "let\n" . $this->mHeader() . "\n"
+            . "    Query = Text.Combine({\n" . implode(",\n", $lines) . "\n        }, \"#(lf)\"),\n"
+            . "    Source = Sql.Database(Server, Database, [Query = Query])\nin\n    Source";
     }
 
     /** Parametri in testa: sostituibili a mano o trasformabili in parametri Power BI. */

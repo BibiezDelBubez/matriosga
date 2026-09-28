@@ -169,6 +169,7 @@ a.ident:hover { text-decoration: underline; }
 .badge-pk { background: #fff4d6; color: #8a5a00; border: 1px solid #f3d27a; }
 .badge-fk { background: #e2efff; color: #0b4fa8; border: 1px solid #a9ccf7; }
 .badge-cand { background: #f3e8ff; color: #6b21a8; border: 1px dashed #c4a1ec; }
+.badge-manual { background: #e6f6ec; color: #146c43; border: 1px solid #8fd1a8; }
 .badge-idx { background: #e8f6ee; color: #146c43; border: 1px solid #a6dcbc; }
 .badge-type { background: #f1f3f7; color: #3b4254; border: 1px solid var(--mt-border); font-family: var(--mt-mono); font-weight: 500; }
 
@@ -220,6 +221,7 @@ th[data-dir="desc"]::after { content: " ▼"; font-size: .7em; }
 .path-node { display: inline-block; background: var(--mt-accent-soft); border: 1px solid #c9cdf6; border-radius: .5rem; padding: .3rem .7rem; font-weight: 600; }
 .path-edge { margin: .15rem 0 .15rem 1.2rem; padding: .35rem 0 .35rem 1rem; border-left: 3px solid #a9ccf7; display: flex; flex-wrap: wrap; gap: .25rem 1.5rem; align-items: center; }
 .path-edge.is-candidate { border-left: 3px dashed #c4a1ec; }
+.path-edge.is-manual { border-left: 3px solid #5cb97f; }
 
 /* Grafo */
 .graph-wrap { position: relative; display: flex; gap: .75rem; height: calc(100vh - 230px); min-height: 420px; }

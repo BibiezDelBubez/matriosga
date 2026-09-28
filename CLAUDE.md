@@ -62,6 +62,8 @@ Documenti da leggere prima di lavorare:
 | Tabelle vuote / copie di sicurezza da nascondere | `App\Services\TableFilterService` + `Controller::noiseFilter()` + `partials/show_all.php` (parametro `?all=1`). **Ogni nuova lista di tabelle/relazioni deve usarlo** |
 | Query di SGA (viste, funzioni, trigger nel DB) | `App\Services\SqlModuleService` (serve permesso VIEW DEFINITION) |
 | Spia modifiche (conteggi prima/dopo, rowversion, colonne data/utente configurabili) | `App\Services\SpyService`; nomi colonne in `config/app.php` → `spy` |
+| Relazioni definite dall'utente (kind 'manual', priorità > FK > candidate) | `App\Services\UserRelationService` (storage/relations.json), esposte da `RelationshipService::manual()`/`edges()`; editor `partials/relation_editor` + `js/relation-editor.js`; coppie proposte `RelationshipService::suggestPairs()` |
+| Badge tipo relazione / commento SQL per tipo | `partials/rel_badge.php` + `Matriosga.relBadge()`; `QueryTextService::kindComment()` |
 | Costruttore di query (spec → SQL validato, anteprima) | `App\Services\QueryBuilderService`; collegamento tabelle `PathFinderService::connect()`; esecuzione `TableDataService::run()` |
 
 **Generico SQL Server**: le funzioni non devono dipendere da convenzioni di SGA. Solo meccanismi standard

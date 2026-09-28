@@ -9,6 +9,7 @@ use App\Models\Column;
 
 /**
  * Relazioni tra tabelle.
+ *  - DEFINITE DALL'UTENTE: collegamenti noti che il DB non dichiara (UserRelationService), priorità massima.
  *  - FK DICHIARATE: dal catalogo SQL Server.
  *  - Relazioni CANDIDATE: dedotte dai metadata, MAI presentate come FK. Due strategie:
  *      'learned' combinazione di colonne che in N FK dichiarate punta sempre alla stessa tabella
@@ -35,7 +36,21 @@ final class RelationshipService
     public function __construct(
         private readonly MetadataCache $cache,
         private readonly DatabaseService $db,
+        private readonly UserRelationService $userRelations,
     ) {
+    }
+
+    /**
+     * Relazioni definite dall'utente, valide per il catalogo attuale (tabelle ancora esistenti).
+     * @return list<array<string, mixed>>
+     */
+    public function manual(Catalog $catalog): array
+    {
+        $objects = $catalog->objects();
+        return array_values(array_filter(
+            array_map(static fn (array $r) => $r + ['kind' => 'manual', 'name' => 'definita da te' . ($r['note'] !== '' ? ': ' . $r['note'] : '')], $this->userRelations->all()),
+            static fn (array $r) => isset($objects[$r['from']], $objects[$r['to']]),
+        ));
     }
 
     /**
@@ -71,6 +86,50 @@ final class RelationshipService
     }
 
     /**
+     * Coppie di colonne proposte per collegare $from (che punta) a $to (puntata), per l'editor delle relazioni.
+     * Per ogni colonna della PK di $to cerca in $from lo stesso nome oppure PREFISSO_nome (es. CLIENTE_ANNO → ANNO).
+     * Un suggerimento per ogni prefisso trovato, i più completi prima. Solo una proposta: l'utente conferma.
+     * @return list<array{prefix: string, pairs: list<array{0: string, 1: string}>}>
+     */
+    public function suggestPairs(Catalog $catalog, string $from, string $to): array
+    {
+        $a = $catalog->require($from);
+        $b = $catalog->require($to);
+        $pk = $b->pkColumns();
+        if (!$pk) {
+            return [];
+        }
+        $byPrefix = [];
+        foreach ($a->columns() as $col) {
+            foreach ($pk as $p) {
+                $name = mb_strtoupper($col->name);
+                $key = mb_strtoupper($p);
+                if ($name === $key) {
+                    $byPrefix[''][$p] = $col->name;
+                } elseif (str_ends_with($name, '_' . $key)) {
+                    $byPrefix[mb_substr($col->name, 0, -mb_strlen($p) - 1)][$p] = $col->name;
+                }
+            }
+        }
+        $out = [];
+        foreach ($byPrefix as $prefix => $found) {
+            if ($prefix === '' && count($byPrefix) > 1) {
+                continue; // lo stesso nome serve solo a completare gli altri prefissi (es. SOCIETA)
+            }
+            $pairs = [];
+            foreach ($pk as $p) {
+                $match = $found[$p] ?? $byPrefix[''][$p] ?? null;
+                if ($match !== null) {
+                    $pairs[] = [$match, $p];
+                }
+            }
+            $out[] = ['prefix' => (string) $prefix, 'pairs' => $pairs, 'complete' => count($pairs) === count($pk)];
+        }
+        usort($out, static fn (array $x, array $y) => [$y['complete'], count($y['pairs'])] <=> [$x['complete'], count($x['pairs'])]);
+        return array_slice($out, 0, 8);
+    }
+
+    /**
      * Toglie le relazioni che toccano tabelle nascoste (vuote/copie, vedi TableFilterService).
      * @param list<array<string, mixed>> $relations
      * @param array<string, true> $hidden
@@ -98,13 +157,14 @@ final class RelationshipService
      * Relazioni di una tabella per il suo dettaglio: FK entranti (le prime $limit: le hub ne hanno migliaia)
      * e relazioni candidate in uscita/entrata (le prime $limit ciascuna), senza le tabelle $hidden.
      * @param array<string, true> $hidden
-     * @return array{fksIn: list<array>, fksInTotal: int, candOut: array{rows: list<array>, total: int}, candIn: array{rows: list<array>, total: int}}
+     * @return array{manual: list<array>, fksIn: list<array>, fksInTotal: int, candOut: array{rows: list<array>, total: int}, candIn: array{rows: list<array>, total: int}}
      */
     public function forTable(Catalog $catalog, string $full, int $limit, array $hidden = []): array
     {
         $fksIn = $this->withoutTables($catalog->fksTo($full), $hidden);
         $candidates = $this->withoutTables($this->candidatesFor($catalog, true), $hidden);
         return [
+            'manual'     => array_values(array_filter($this->manual($catalog), static fn (array $r) => $r['from'] === $full || $r['to'] === $full)),
             'fksIn'      => array_slice($fksIn, 0, $limit),
             'fksInTotal' => count($fksIn),
             'candOut'    => $this->filter($candidates, '', $full, null, $limit),
@@ -306,7 +366,8 @@ final class RelationshipService
      */
     public function edges(Catalog $catalog, bool $withCandidates, int $minScore): array
     {
-        $edges = array_map(static fn (array $fk) => $fk + ['kind' => 'fk'], $catalog->fks());
+        // relazioni definite dall'utente: sempre incluse, prima di tutto
+        $edges = array_merge($this->manual($catalog), array_map(static fn (array $fk) => $fk + ['kind' => 'fk'], $catalog->fks()));
         if ($withCandidates) {
             foreach ($this->candidatesFor($catalog, true) as $c) {
                 if ($c['score'] >= $minScore) {

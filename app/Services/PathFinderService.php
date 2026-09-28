@@ -17,6 +17,9 @@ final class PathFinderService
 {
     private const MAX_EXPANSIONS = 200000; // freno di sicurezza contro esplosioni combinatorie
 
+    /** Fra due tabelle vince la relazione più affidabile: definita dall'utente > FK dichiarata > candidata. */
+    private const KIND_RANK = ['manual' => 3, 'fk' => 2, 'candidate' => 1];
+
     /** @var array<string, array> grafi già costruiti in questa richiesta (connect() chiama find() più volte) */
     private array $graphs = [];
 
@@ -92,9 +95,8 @@ final class PathFinderService
         };
         $walk($from);
 
-        // Ordine: meno passaggi, meno relazioni candidate, tabelle intermedie meno "generiche".
         $paths = array_map(fn (array $nodes) => $this->describe($nodes, $adj, $inDegree), $found);
-        usort($paths, static fn (array $a, array $b) => [count($a['steps']), $a['candidates'], $a['generic']] <=> [count($b['steps']), $b['candidates'], $b['generic']]);
+        usort($paths, [self::class, 'compare']);
 
         return [
             'paths'     => array_slice($paths, 0, $opt['max']),
@@ -130,16 +132,11 @@ final class PathFinderService
                     'cols_a' => $s['cols_b'], 'cols_b' => $s['cols_a'],
                 ], array_reverse($steps));
                 $nodes = array_merge([$reversed[0]['a']], array_column($reversed, 'b'));
-                $all[implode('>', $nodes)] = [
-                    'nodes'      => $nodes,
-                    'steps'      => $reversed,
-                    'candidates' => count(array_filter($reversed, static fn ($s) => $s['rel']['kind'] === 'candidate')),
-                    'generic'    => $path['generic'],
-                ];
+                $all[implode('>', $nodes)] = self::summary($nodes, $reversed, $path['generic']);
             }
         }
         $all = array_values($all);
-        usort($all, static fn (array $a, array $b) => [count($a['steps']), $a['candidates'], $a['generic']] <=> [count($b['steps']), $b['candidates'], $b['generic']]);
+        usort($all, [self::class, 'compare']);
         return array_slice($all, 0, $opt['max']);
     }
 
@@ -165,7 +162,7 @@ final class PathFinderService
             }
             $current = $adj[$a][$b] ?? null;
             $better = $current === null
-                || ($current['kind'] === 'candidate' && $rel['kind'] === 'fk')
+                || self::KIND_RANK[$rel['kind']] > self::KIND_RANK[$current['kind']]
                 || ($current['kind'] === $rel['kind'] && $rel['kind'] === 'candidate' && $rel['score'] > $current['score']);
             if ($better) {
                 $adj[$a][$b] = $adj[$b][$a] = $rel;
@@ -197,7 +194,38 @@ final class PathFinderService
         foreach (array_slice($nodes, 1, -1) as $n) {
             $generic += $inDegree[$n] ?? 0;
         }
-        return ['nodes' => $nodes, 'steps' => $steps, 'candidates' => $candidates, 'generic' => $generic];
+        return self::summary($nodes, $steps, $generic);
+    }
+
+    /**
+     * Dati di confronto di un percorso.
+     * weak = passaggi "A → X ← B": A e B puntano entrambe alla stessa tabella X (tipicamente un'anagrafica
+     *        o una tabella di configurazione). Collegano righe che hanno solo un valore in comune: la JOIN
+     *        moltiplica le righe e quasi mai è quello che serve.
+     * @param list<string> $nodes
+     * @param list<array> $steps
+     * @return array{nodes: list<string>, steps: list<array>, candidates: int, manual: int, weak: int, generic: int}
+     */
+    private static function summary(array $nodes, array $steps, int $generic): array
+    {
+        $weak = 0;
+        for ($i = 0; $i < count($steps) - 1; $i++) {
+            if ($steps[$i]['forward'] && !$steps[$i + 1]['forward']) {
+                $weak++;
+            }
+        }
+        $count = static fn (string $kind) => count(array_filter($steps, static fn (array $s) => $s['rel']['kind'] === $kind));
+        return ['nodes' => $nodes, 'steps' => $steps, 'candidates' => $count('candidate'), 'manual' => $count('manual'), 'weak' => $weak, 'generic' => $generic];
+    }
+
+    /**
+     * Ordine dei percorsi: prima quelli senza passaggi deboli, poi i più corti, poi quelli che usano
+     * relazioni definite dall'utente, poi meno candidate, poi tabelle intermedie meno "generiche".
+     */
+    private static function compare(array $a, array $b): int
+    {
+        return [$a['weak'] > 0, count($a['steps']), -$a['manual'], $a['candidates'], $a['generic']]
+            <=> [$b['weak'] > 0, count($b['steps']), -$b['manual'], $b['candidates'], $b['generic']];
     }
 
     /** Hub collegati direttamente a partenza o arrivo ma esclusi come passaggi: per spiegare "nessun percorso". @return list<string> */

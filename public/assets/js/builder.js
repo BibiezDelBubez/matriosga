@@ -104,7 +104,7 @@
             const v = t.via;
             const pairs = v ? v.cols_parent.map((c, k) => `${E(c)} = ${E(v.cols_child[k])}`).join(', ') : '';
             const alts = t.alts && t.alts.length > 1 ? `<select class="form-select form-select-sm w-auto" data-alt="${E(t.name)}" title="Altri modi di collegarla">
-                ${t.alts.map((p, k) => `<option value="${k}"${k === t.alt ? ' selected' : ''}>percorso ${k + 1}: ${E(p.nodes.map(n => n.split('.').pop()).join(' → '))}</option>`).join('')}</select>` : '';
+                ${t.alts.map((p, k) => `<option value="${k}"${k === t.alt ? ' selected' : ''}>percorso ${k + 1}: ${E(p.nodes.map(n => n.split('.').pop()).join(' → '))}${p.weak ? ' ⚠ debole' : ''}</option>`).join('')}</select>` : '';
             return `<div class="b-table" data-name="${E(t.name)}">
                 <div class="d-flex align-items-center gap-2">
                     <span class="badge text-bg-dark ident">t${i}</span>
@@ -116,7 +116,7 @@
                 ${v ? `<div class="b-via small">
                     <div class="text-secondary">collegata a <span class="ident">${E(v.parent.split('.').pop())}</span>:
                         <span class="ident">${pairs}</span>
-                        ${v.kind === 'candidate' ? `<span class="badge badge-cand">${E(v.label)}</span>` : `<span class="badge badge-fk" title="${E(v.label)}">FK</span>`}</div>
+                        ${v.kind === 'candidate' ? `<span class="badge badge-cand">${E(v.label)}</span>` : Matriosga.relBadge(v.kind, v.label)}</div>
                     <div class="d-flex flex-wrap gap-2 mt-1">
                         <select class="form-select form-select-sm w-auto" data-join="${E(t.name)}" title="LEFT: tiene tutte le righe della tabella sopra anche senza corrispondenza. INNER: solo le righe che hanno corrispondenza.">
                             <option value="LEFT"${v.join === 'LEFT' ? ' selected' : ''}>tieni tutte le righe (LEFT JOIN)</option>
@@ -188,6 +188,19 @@
     // ---------- eventi ----------
 
     $('b-add').addEventListener('click', addTable);
+
+    // "Collega a mano": definisci la relazione (es. tabella ponte → tabella da aggiungere); poi si riprova l'aggiunta.
+    $('b-manual').addEventListener('click', () => {
+        const typed = $('b-table').value.trim();
+        Matriosga.relationEditor.open({
+            from: '',
+            to: typed,
+            onSaved: rel => {
+                if (!$('b-table').value.trim()) $('b-table').value = has(rel.from) ? rel.to : rel.from;
+                addTable();
+            },
+        });
+    });
     $('b-table').addEventListener('keydown', ev => { if (ev.key === 'Enter' && !ev.defaultPrevented) { ev.preventDefault(); addTable(); } });
 
     [['b-cand', 'cand'], ['b-hubs', 'hubs'], ['b-all', 'all']].forEach(([id, key]) => {
