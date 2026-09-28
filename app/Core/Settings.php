@@ -16,7 +16,7 @@ final class Settings
     private const FILE = BASE_PATH . '/storage/settings.json';
     private const SECRETS_FILE = BASE_PATH . '/storage/secrets.json';
     private const DEFAULT_KEY_FILE = BASE_PATH . '/storage/app.key';
-    private const EDITABLE = ['connection', 'limits'];
+    private const EDITABLE = ['connection', 'limits', 'filters'];
 
     /** @var array<string, mixed> */
     private array $defaults;

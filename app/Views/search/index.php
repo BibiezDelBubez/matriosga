@@ -1,5 +1,5 @@
 <?php
-/** @var string $value @var string $mode @var int $maxRows @var array<string,string> $modes */
+/** @var string $value @var string $mode @var int $maxRows @var array<string,string> $modes @var array $noise */
 ?>
 <div class="page-head">
     <div>
@@ -38,6 +38,7 @@
                 <input class="form-check-input" type="checkbox" role="switch" id="force" name="force" value="1">
                 <label class="form-check-label" for="force">Anche tabelle oltre <?= e(fmt_int($maxRows)) ?> righe <span class="text-secondary">(lento)</span></label>
             </div>
+            <?= $this->partial('partials/show_all', ['noise' => $noise]) ?>
         </div>
         <div class="small text-secondary mt-2"><i class="fa-solid fa-circle-info"></i>
             Maiuscole/minuscole indifferenti. «Uguale a» è la modalità più veloce (può usare gli indici); «contiene» legge tutte le righe.</div>

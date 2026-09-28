@@ -1,5 +1,8 @@
 <?php
-/** @var App\Models\Table $table @var list<string> $selected @var array $joinsOut @var array $joinsIn @var list<array> $fksIn @var array $code @var string $tab */
+/**
+ * @var App\Models\Table $table @var list<string> $selected @var array $joinsOut @var array $joinsIn @var list<array> $fksIn
+ * @var int $fksInTotal @var array $code @var string $tab @var array $noise @var ?string $copyReason
+ */
 $pk = $table->pk();
 $tabs = [
     'columns' => ['Colonne', 'fa-table-columns', count($table->columns())],
@@ -19,9 +22,12 @@ $tabs = [
                 <i class="fa-regular fa-copy"></i> <?= e($table->quoted()) ?>
             </button>
             <a class="btn btn-sm btn-outline-primary" href="<?= e(url('/graph', ['t' => $table->fullName])) ?>"><i class="fa-solid fa-diagram-project"></i> Grafo</a>
+            <a class="btn btn-sm btn-outline-primary" href="<?= e(url('/queries', ['q' => $table->name])) ?>" title="Viste, funzioni e trigger di SGA che usano questa tabella"><i class="fa-solid fa-scroll"></i> Come la usa SGA</a>
         </h1>
         <div class="d-flex flex-wrap gap-2 mt-2 small">
             <span class="badge <?= $table->isView ? 'text-bg-info' : 'text-bg-primary' ?>"><?= $table->isView ? 'Vista' : 'Tabella' ?></span>
+            <?php if ($copyReason): ?><span class="badge text-bg-warning" title="<?= e($copyReason) ?>">probabile copia di sicurezza</span><?php endif; ?>
+            <?php if ($table->rows === 0): ?><span class="badge text-bg-secondary">vuota</span><?php endif; ?>
             <span class="badge badge-type">schema <?= e($table->schema) ?></span>
             <?php if ($table->rows !== null): ?><span class="badge badge-type" title="Stima da sys.partitions">≈ <?= e(fmt_int($table->rows)) ?> righe</span><?php endif; ?>
             <span class="badge badge-type"><?= e(count($table->columns())) ?> colonne</span>
@@ -45,7 +51,7 @@ $tabs = [
 <div class="tab-content card border-top-0 rounded-top-0">
     <?php foreach (array_keys($tabs) as $key): ?>
         <div class="tab-pane fade<?= $tab === $key ? ' show active' : '' ?>" id="pane-<?= e($key) ?>" role="tabpanel">
-            <?= $this->partial('tables/_' . $key, compact('table', 'selected', 'joinsOut', 'joinsIn', 'fksIn', 'fksInTotal', 'code', 'candOut', 'candIn')) ?>
+            <?= $this->partial('tables/_' . $key, compact('table', 'selected', 'joinsOut', 'joinsIn', 'fksIn', 'fksInTotal', 'code', 'candOut', 'candIn', 'noise')) ?>
         </div>
     <?php endforeach; ?>
 </div>

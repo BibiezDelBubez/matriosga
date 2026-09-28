@@ -1,5 +1,8 @@
 <?php
-/** @var list<list<mixed>> $tables (Catalog::summaries, formato compatto) @var list<string> $schemas @var string $query @var array $stats */
+/**
+ * @var list<list<mixed>> $tables (Catalog::summaries + flag "vuota/copia" in posizione 8) @var list<string> $schemas
+ * @var string $query @var array $stats @var array $noise Controller::noiseFilter()
+ */
 ?>
 <div class="page-head">
     <div>
@@ -29,10 +32,7 @@
                 <?php endforeach; ?>
             </select>
         <?php endif; ?>
-        <div class="form-check form-switch ms-1">
-            <input class="form-check-input" type="checkbox" role="switch" id="tables-nonempty">
-            <label class="form-check-label small" for="tables-nonempty">Solo con righe</label>
-        </div>
+        <div class="ms-1"><?= $this->partial('partials/show_all', ['noise' => $noise, 'id' => 'tables-all']) ?></div>
     </div>
     <div class="table-responsive scroll-y">
         <table class="table table-sm table-hover table-sticky mb-0" id="tables-list">

@@ -27,6 +27,7 @@ final class SearchController extends Controller
             'value'   => $request->str('q'),
             'mode'    => $request->enum('mode', array_keys(Sql::MATCH_MODES), 'contains'),
             'modes'   => Sql::MATCH_MODES,
+            'noise'   => $this->noiseFilter($request, $this->cache->catalog()),
             'maxRows' => (int) setting('limits.search_max_table_rows'),
             'scripts' => ['js/search.js'],
         ]);
@@ -35,7 +36,8 @@ final class SearchController extends Controller
     public function plan(Request $request): Response
     {
         $catalog = $this->cache->catalog();
-        return $this->ok($this->search->plan($catalog, $this->criteria($request, $catalog), $request->bool('force')));
+        $hidden = $this->noiseFilter($request, $catalog)['hidden'];
+        return $this->ok($this->search->plan($catalog, $this->criteria($request, $catalog), $request->bool('force'), $hidden));
     }
 
     public function run(Request $request): Response

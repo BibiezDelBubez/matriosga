@@ -66,14 +66,15 @@ final class ValueSearchService
     /**
      * @return array{tables: list<array{0: string, 1: ?int, 2: int}>, skipped: list<array{0: string, 1: ?int, 2: int}>, columns: int, maxRows: int}
      */
-    public function plan(Catalog $catalog, array $crit, bool $force): array
+    /** @param array<string, true> $hidden tabelle da non interrogare (copie, vedi TableFilterService) */
+    public function plan(Catalog $catalog, array $crit, bool $force, array $hidden = []): array
     {
         $maxRows = (int) $this->settings->get('limits.search_max_table_rows');
         $objects = $catalog->objects();
         $tables = $skipped = [];
         $columns = 0;
         foreach ($catalog->columnIndex() as $full => $cols) {
-            if ($objects[$full]['type'] === 'V' && !$crit['views']) {
+            if (($objects[$full]['type'] === 'V' && !$crit['views']) || isset($hidden[$full])) {
                 continue;
             }
             $n = 0;

@@ -232,6 +232,12 @@ th[data-dir="desc"]::after { content: " ▼"; font-size: .7em; }
 .bar-fill { display: block; height: 100%; background: var(--mt-accent); border-radius: 5px; }
 .bar-value { white-space: nowrap; text-align: right; }
 
+/* Query di SGA */
+.snippet { font-family: var(--mt-mono); font-size: .78rem; background: #f6f7fb; border: 1px solid var(--mt-border); border-radius: .4rem;
+    padding: .4rem .6rem; margin: .3rem 0 0; white-space: pre-wrap; overflow-wrap: anywhere; max-height: 9em; overflow: auto; }
+.snippet mark, .code-block mark { background: #ffe58a; color: #1f2433; padding: 0 1px; border-radius: 2px; }
+.code-block.code-tall { max-height: 60vh; }
+
 /* Griglia dati */
 .data-grid { max-height: 60vh; overflow: auto; }
 .data-grid table { font-size: .8rem; }

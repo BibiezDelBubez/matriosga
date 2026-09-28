@@ -59,6 +59,9 @@ Documenti da leggere prima di lavorare:
 | Profilo colonna (statistiche, top valori, distribuzione) | `App\Services\ColumnAnalysisService` |
 | Paginazione | `App\Helpers\Pager` + `partials/pager.php` (dimensione: `limits.page_size`) |
 | Controlli ambiente server + istruzioni installazione | `App\Services\EnvironmentService` (pagina Impostazioni → Ambiente server) |
+| Tabelle vuote / copie di sicurezza da nascondere | `App\Services\TableFilterService` + `Controller::noiseFilter()` + `partials/show_all.php` (parametro `?all=1`). **Ogni nuova lista di tabelle/relazioni deve usarlo** |
+| Query di SGA (viste, funzioni, trigger nel DB) | `App\Services\SqlModuleService` (serve permesso VIEW DEFINITION) |
+| Ricerca/evidenziazione testo | PHP `App\Helpers\Text` (regex parola intera, highlight); JS `Matriosga.highlight()` |
 | Riga relazione (FK o candidata) con Verifica + Copia JOIN | `partials/relation_row.php`; pulsante `[data-verify]` gestito in `app.js` |
 | Campo con autocompletamento tabelle | attributo `data-table-picker` (app.js, API `/api/tables/names`) |
 | Autocompletamento generico (menu sotto il campo, mai `<datalist>`) | `Matriosga.autocomplete(input, getItems)` |

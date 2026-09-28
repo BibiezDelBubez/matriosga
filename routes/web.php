@@ -7,6 +7,7 @@ use App\Controllers\DashboardController;
 use App\Controllers\PathController;
 use App\Controllers\RelationsController;
 use App\Controllers\SearchController;
+use App\Controllers\SgaQueriesController;
 use App\Controllers\TablesController;
 use App\Controllers\GraphController;
 use App\Controllers\HomeController;
@@ -27,6 +28,8 @@ return static function (Router $r): void {
     $r->get('/analysis', [AnalysisController::class, 'index']);
     $r->get('/api/analysis', [AnalysisController::class, 'data']);
     $r->get('/path', [PathController::class, 'index']);
+    $r->get('/queries', [SgaQueriesController::class, 'index']);
+    $r->get('/api/queries/show', [SgaQueriesController::class, 'show']);
     $r->get('/graph', [GraphController::class, 'index']);
     $r->post('/api/graph', [GraphController::class, 'data']);
     $r->get('/columns', [ColumnsController::class, 'index']);

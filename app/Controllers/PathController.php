@@ -25,7 +25,9 @@ final class PathController extends Controller
     public function index(Request $request): Response
     {
         $catalog = $this->cache->catalog();
+        $noise = $this->noiseFilter($request, $catalog);
         $opt = [
+            'hidden'     => $noise['hidden'],
             'depth'      => $request->int('depth', (int) $this->settings->get('limits.path_max_depth'), 1, 8),
             'max'        => (int) $this->settings->get('limits.path_max_results'),
             'candidates' => $request->bool('cand'),
@@ -52,6 +54,7 @@ final class PathController extends Controller
             'from'   => $from,
             'to'     => $to,
             'opt'    => $opt,
+            'noise'  => $noise,
             'avoid'  => $request->str('avoid'),
             'result' => $result,
             'sql'    => $sql,

@@ -59,6 +59,17 @@
             return `<span class="text-nowrap">${isView ? '<i class="fa-regular fa-eye text-secondary me-1" title="Vista"></i>' : ''}<a class="ident" href="${E(Matriosga.url('/tables/show', { t: full }))}">${E(full)}</a>${Matriosga.copyBtn(full, 'Copia nome tabella')}</span>`;
         },
 
+        /**
+         * HTML escapato con le occorrenze in <mark> (come App\Helpers\Text::highlight).
+         * terms: stringa o array; wholeWord: non dentro identificatori più lunghi.
+         */
+        highlight(text, terms, wholeWord = false) {
+            const list = (Array.isArray(terms) ? terms : [terms]).filter(Boolean).map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+            if (!list.length) return Matriosga.esc(text);
+            const re = new RegExp((wholeWord ? '(?<![A-Za-z0-9_])' : '') + '(' + list.join('|') + ')' + (wholeWord ? '(?![A-Za-z0-9_])' : ''), 'ig');
+            return String(text).split(re).map((part, i) => i % 2 ? `<mark>${Matriosga.esc(part)}</mark>` : Matriosga.esc(part)).join('');
+        },
+
         /** Blocco codice copiabile (stessa resa di partials/code_block.php). */
         codeBlock(title, code, icon = 'fa-code') {
             const E = Matriosga.esc;
@@ -243,11 +254,7 @@
             const r = input.getBoundingClientRect();
             Object.assign(menu.style, { left: r.left + scrollX + 'px', top: r.bottom + scrollY + 2 + 'px', minWidth: r.width + 'px' });
         };
-        const mark = (text, tokens) => {
-            let html = Matriosga.esc(text);
-            tokens.forEach(t => { html = html.replace(new RegExp('(' + t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'ig'), '<mark>$1</mark>'); });
-            return html;
-        };
+        const mark = (text, tokens) => Matriosga.highlight(text, tokens);
         const paint = () => menu.querySelectorAll('.dropdown-item').forEach((el, i) => el.classList.toggle('active', i === active));
         const select = value => {
             input.value = value;

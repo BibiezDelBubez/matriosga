@@ -70,6 +70,20 @@ final class RelationshipService
         return ['rows' => $rows, 'total' => $total];
     }
 
+    /**
+     * Toglie le relazioni che toccano tabelle nascoste (vuote/copie, vedi TableFilterService).
+     * @param list<array<string, mixed>> $relations
+     * @param array<string, true> $hidden
+     * @return list<array<string, mixed>>
+     */
+    public function withoutTables(array $relations, array $hidden): array
+    {
+        if (!$hidden) {
+            return $relations;
+        }
+        return array_values(array_filter($relations, static fn (array $r) => !isset($hidden[$r['from']]) && !isset($hidden[$r['to']])));
+    }
+
     /** FK dichiarate già ristrette per tabella (usa gli indici del Catalog). @return list<array<string, mixed>> */
     public function declared(Catalog $catalog, ?string $from, ?string $to): array
     {
@@ -82,13 +96,14 @@ final class RelationshipService
 
     /**
      * Relazioni di una tabella per il suo dettaglio: FK entranti (le prime $limit: le hub ne hanno migliaia)
-     * e relazioni candidate in uscita/entrata (le prime $limit ciascuna).
+     * e relazioni candidate in uscita/entrata (le prime $limit ciascuna), senza le tabelle $hidden.
+     * @param array<string, true> $hidden
      * @return array{fksIn: list<array>, fksInTotal: int, candOut: array{rows: list<array>, total: int}, candIn: array{rows: list<array>, total: int}}
      */
-    public function forTable(Catalog $catalog, string $full, int $limit): array
+    public function forTable(Catalog $catalog, string $full, int $limit, array $hidden = []): array
     {
-        $fksIn = $catalog->fksTo($full);
-        $candidates = $this->candidatesFor($catalog, true);
+        $fksIn = $this->withoutTables($catalog->fksTo($full), $hidden);
+        $candidates = $this->withoutTables($this->candidatesFor($catalog, true), $hidden);
         return [
             'fksIn'      => array_slice($fksIn, 0, $limit),
             'fksInTotal' => count($fksIn),

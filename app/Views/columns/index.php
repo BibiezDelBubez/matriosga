@@ -1,7 +1,7 @@
 <?php
 /**
  * @var string $query @var string $mode @var string $category @var bool $views @var ?array $result @var ?App\Helpers\Pager $pager
- * @var array<string,string> $modes @var array<string,string> $categories @var int $maxMatches
+ * @var array<string,string> $modes @var array<string,string> $categories @var int $maxMatches @var array $noise
  */
 ?>
 <div class="page-head">
@@ -34,10 +34,13 @@
                 <button class="btn btn-primary btn-lg" type="submit" title="Cerca"><i class="fa-solid fa-magnifying-glass"></i></button>
             </div>
         </div>
-        <div class="form-check form-switch mt-2">
-            <input type="hidden" name="views" value="0">
-            <input class="form-check-input" type="checkbox" role="switch" id="views" name="views" value="1"<?= $views ? ' checked' : '' ?>>
-            <label class="form-check-label small" for="views">Includi le viste</label>
+        <div class="d-flex flex-wrap gap-4 mt-2">
+            <div class="form-check form-switch small mb-0">
+                <input type="hidden" name="views" value="0">
+                <input class="form-check-input" type="checkbox" role="switch" id="views" name="views" value="1"<?= $views ? ' checked' : '' ?>>
+                <label class="form-check-label" for="views">Includi le viste</label>
+            </div>
+            <?= $this->partial('partials/show_all', ['noise' => $noise]) ?>
         </div>
     </div>
 </form>
@@ -89,6 +92,6 @@
             <div class="empty-state d-none" data-filter-empty="#column-results"><i class="fa-solid fa-filter"></i>Nessun risultato corrisponde al filtro.</div>
         </div>
         <?= $this->partial('partials/pager', ['pager' => $pager, 'path' => '/columns',
-            'query' => ['q' => $query, 'mode' => $mode, 'cat' => $category, 'views' => $views ? null : 0]]) ?>
+            'query' => ['q' => $query, 'mode' => $mode, 'cat' => $category, 'views' => $views ? null : 0, 'all' => $noise['all'] ? 1 : null]]) ?>
     </div>
 <?php endif; ?>

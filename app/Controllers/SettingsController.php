@@ -26,6 +26,7 @@ final class SettingsController extends Controller
             'title'         => 'Impostazioni',
             'c'             => $this->settings->connection(),
             'limits'        => $this->settings->get('limits'),
+            'filters'       => $this->settings->get('filters'),
             'limitDefaults' => $this->settings->defaults('limits'),
             'saved'         => $request->bool('saved'),
             'scripts'       => ['js/settings.js'],
@@ -47,6 +48,7 @@ final class SettingsController extends Controller
     {
         $this->settings->update('connection', (array) $request->input('connection', []));
         $this->settings->update('limits', (array) $request->input('limits', []));
+        $this->settings->update('filters', (array) $request->input('filters', []));
 
         $password = (string) $request->input('password', '');
         if ($request->bool('clear_password')) {

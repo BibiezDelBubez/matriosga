@@ -2,9 +2,11 @@
 /**
  * @var string $kind declared|candidates @var string $query @var ?string $from @var ?string $to @var bool $hubs
  * @var ?array $result @var array<int,string> $joins @var ?App\Helpers\Pager $pager @var int $total @var array<string,int> $hubList
+ * @var array $noise Controller::noiseFilter()
  */
 $candidates = $kind === 'candidates';
-$tabUrl = static fn (string $k) => url('/relations', ['kind' => $k, 'q' => $query, 'from' => $from, 'to' => $to]);
+$keep = ['q' => $query, 'from' => $from, 'to' => $to, 'all' => $noise['all'] ? 1 : null];
+$tabUrl = static fn (string $k) => url('/relations', ['kind' => $k] + $keep);
 ?>
 <div class="page-head">
     <div>
@@ -39,12 +41,15 @@ $tabUrl = static fn (string $k) => url('/relations', ['kind' => $k, 'q' => $quer
                 <button class="btn btn-primary" type="submit" title="Cerca"><i class="fa-solid fa-magnifying-glass"></i></button>
             </div>
         </div>
-        <?php if ($candidates): ?>
-            <div class="form-check form-switch mt-2 small">
-                <input class="form-check-input" type="checkbox" role="switch" id="hubs" name="hubs" value="1"<?= $hubs ? ' checked' : '' ?> data-autosubmit>
-                <label class="form-check-label" for="hubs">Includi le candidate verso tabelle hub (società, filiali, lingue…)</label>
-            </div>
-        <?php endif; ?>
+        <div class="d-flex flex-wrap gap-4 mt-2">
+            <?php if ($candidates): ?>
+                <div class="form-check form-switch small mb-0">
+                    <input class="form-check-input" type="checkbox" role="switch" id="hubs" name="hubs" value="1"<?= $hubs ? ' checked' : '' ?> data-autosubmit>
+                    <label class="form-check-label" for="hubs">Includi le candidate verso tabelle hub (società, filiali, lingue…)</label>
+                </div>
+            <?php endif; ?>
+            <?= $this->partial('partials/show_all', ['noise' => $noise, 'submit' => true]) ?>
+        </div>
     </form>
 
     <?php if ($candidates): ?>
@@ -101,6 +106,6 @@ $tabUrl = static fn (string $k) => url('/relations', ['kind' => $k, 'q' => $quer
             <div class="empty-state d-none" data-filter-empty="#rel-list"><i class="fa-solid fa-filter"></i>Nessuna relazione corrisponde al filtro.</div>
         </div>
         <?= $this->partial('partials/pager', ['pager' => $pager, 'path' => '/relations',
-            'query' => ['kind' => $kind, 'q' => $query, 'from' => $from, 'to' => $to, 'hubs' => $hubs ? 1 : null]]) ?>
+            'query' => ['kind' => $kind, 'hubs' => $hubs ? 1 : null] + $keep]) ?>
     <?php endif; ?>
 </div>

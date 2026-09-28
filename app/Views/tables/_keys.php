@@ -2,12 +2,17 @@
 /**
  * Scheda chiavi: PK, FK in uscita, FK in entrata (solo le prime: $fksIn).
  * @var App\Models\Table $table @var array $joinsOut @var array $joinsIn @var list<array> $fksIn @var int $fksInTotal
- * @var array $candOut @var array $candIn candidate {rows, total, joins}
+ * @var array $candOut @var array $candIn candidate {rows, total, joins} @var array $noise Controller::noiseFilter()
  */
 $pk = $table->pk();
 $fksOut = $table->fksOut();
 ?>
 <div class="card-body">
+    <form method="get" action="<?= e(url('/tables/show')) ?>" class="d-flex justify-content-end mb-2">
+        <input type="hidden" name="t" value="<?= e($table->fullName) ?>">
+        <input type="hidden" name="tab" value="keys">
+        <?= $this->partial('partials/show_all', ['noise' => $noise, 'id' => 'keys-all', 'submit' => true]) ?>
+    </form>
     <h2 class="section-title"><i class="fa-solid fa-key"></i> Chiave primaria</h2>
     <?php if ($pk): ?>
         <div class="pk-box mb-4">

@@ -115,6 +115,24 @@ $check = static fn (string $name, string $label, bool $on, string $help = '') =>
                     <?php endforeach; ?>
                 </div>
             </div>
+
+            <div class="card mt-4">
+                <div class="card-header"><i class="fa-solid fa-filter"></i> Tabelle nascoste di default</div>
+                <div class="card-body">
+                    <?php foreach ([
+                        'hide_empty'  => ['Nascondi le tabelle vuote', 'Tabelle con 0 righe: nessun dato da portare in Power BI.'],
+                        'hide_copies' => ['Nascondi le copie di sicurezza', 'Riconosciute dal nome: Save_…, …_SAVE_2019_…, XXBeforeRepair_…, …Old.'],
+                    ] as $key => [$label, $help]): ?>
+                        <div class="form-check form-switch mb-2">
+                            <input type="hidden" name="filters[<?= e($key) ?>]" value="0">
+                            <input class="form-check-input" type="checkbox" role="switch" id="f_<?= e($key) ?>" name="filters[<?= e($key) ?>]" value="1"<?= $filters[$key] ? ' checked' : '' ?>>
+                            <label class="form-check-label" for="f_<?= e($key) ?>"><?= e($label) ?></label>
+                            <div class="form-text mt-0"><?= e($help) ?></div>
+                        </div>
+                    <?php endforeach; ?>
+                    <div class="small text-secondary">In ogni pagina resta l'interruttore «Mostra anche tabelle vuote e copie».</div>
+                </div>
+            </div>
         </div>
     </div>
 </form>

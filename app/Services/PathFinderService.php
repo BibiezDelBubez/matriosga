@@ -22,7 +22,7 @@ final class PathFinderService
     }
 
     /**
-     * @param array{depth: int, max: int, candidates: bool, minScore: int, hubs: bool, avoid: list<string>} $opt
+     * @param array{depth: int, max: int, candidates: bool, minScore: int, hubs: bool, avoid: list<string>, hidden?: array<string, true>} $opt
      * @return array{paths: list<array>, distance: ?int, truncated: bool, blocked: list<string>}
      */
     public function find(Catalog $catalog, string $from, string $to, array $opt): array
@@ -31,7 +31,8 @@ final class PathFinderService
             throw HttpException::badRequest('Partenza e destinazione sono la stessa tabella.');
         }
         [$adj, $inDegree] = $this->graph($catalog, $opt['candidates'], $opt['minScore']);
-        $avoid = array_flip($opt['avoid']);
+        // tabelle da non attraversare: scelte dall'utente + vuote/copie (TableFilterService)
+        $avoid = array_flip($opt['avoid']) + ($opt['hidden'] ?? []);
         $allowed = static fn (string $n): bool => $n === $from || $n === $to
             || (!isset($avoid[$n]) && ($opt['hubs'] || ($inDegree[$n] ?? 0) <= RelationshipService::HUB_IN));
 

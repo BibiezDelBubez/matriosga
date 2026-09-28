@@ -23,6 +23,7 @@
             numbers: fd.has('numbers'),
             views: fd.has('views'),
             force: fd.has('force'),
+            all: fd.has('all'),
         };
     }
 

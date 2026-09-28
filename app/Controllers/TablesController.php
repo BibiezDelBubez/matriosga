@@ -10,6 +10,7 @@ use App\Services\MetadataCache;
 use App\Services\QueryTextService;
 use App\Services\RelationshipService;
 use App\Services\TableDataService;
+use App\Services\TableFilterService;
 
 final class TablesController extends Controller
 {
@@ -21,15 +22,22 @@ final class TablesController extends Controller
         private readonly QueryTextService $queryText,
         private readonly TableDataService $data,
         private readonly RelationshipService $relations,
+        private readonly TableFilterService $filter,
     ) {
     }
 
     public function index(Request $request): Response
     {
         $catalog = $this->cache->catalog();
+        $noise = $this->noiseFilter($request, $catalog);
+        // Tutte le righe al browser con un flag "rumore" (posizione 8): il filtro è istantaneo lato client.
+        $flags = $this->filter->hidden($catalog);
+        $rows = array_map(static fn (array $r) => [...$r, isset($flags[$r[0]]) ? 1 : 0], $catalog->summaries());
+
         return $this->view('tables/index', [
             'title'   => 'Tabelle',
-            'tables'  => $catalog->summaries(),
+            'tables'  => $rows,
+            'noise'   => $noise,
             'stats'   => $catalog->stats(),
             'schemas' => array_keys($catalog->stats()['schemas']),
             'query'   => $request->str('q'),
@@ -43,10 +51,13 @@ final class TablesController extends Controller
         $table = $catalog->require($request->str('t'));
         $selected = $table->pickColumns($request->list('cols'));
 
-        $rel = $this->relations->forTable($catalog, $table->fullName, self::MAX_RELATIONS);
+        $noise = $this->noiseFilter($request, $catalog);
+        $rel = $this->relations->forTable($catalog, $table->fullName, self::MAX_RELATIONS, $noise['hidden']);
         $sql = $this->queryText->select($table, $selected ?: null);
 
         return $this->view('tables/show', [
+            'noise'      => $noise,
+            'copyReason' => $this->filter->copyReason($catalog, $table->fullName),
             'title'      => $table->fullName,
             'breadcrumb' => ['Tabelle' => url('/tables'), $table->fullName => null],
             'table'      => $table,
@@ -70,7 +81,9 @@ final class TablesController extends Controller
     /** Nomi di tutte le tabelle/viste (per l'autocompletamento dei campi tabella). */
     public function names(Request $request): Response
     {
-        return $this->ok(array_keys($this->cache->catalog()->objects()));
+        $catalog = $this->cache->catalog();
+        $hidden = $this->noiseFilter($request, $catalog)['hidden'];
+        return $this->ok(array_values(array_filter(array_keys($catalog->objects()), static fn (string $n) => !isset($hidden[$n]))));
     }
 
     /** Colonne di una tabella (per i campi di scelta colonna). */

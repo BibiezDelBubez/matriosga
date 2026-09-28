@@ -16,7 +16,8 @@ final class ColumnSearchService
      * Tutte le colonne trovate (fino a MAX_MATCHES), ordinate per nome colonna e tabella: la paginazione la fa il controller.
      * @return array{rows: list<array<string, mixed>>, total: int, tables: int, truncated: bool}
      */
-    public function search(Catalog $catalog, string $query, string $mode, string $category = '', bool $views = true): array
+    /** @param array<string, true> $hidden tabelle da saltare (vuote/copie, vedi TableFilterService) */
+    public function search(Catalog $catalog, string $query, string $mode, string $category = '', bool $views = true, array $hidden = []): array
     {
         $needle = mb_strtolower(trim($query));
         $objects = $catalog->objects();
@@ -26,7 +27,7 @@ final class ColumnSearchService
 
         foreach ($catalog->columnIndex() as $full => $columns) {
             $isView = $objects[$full]['type'] === 'V';
-            if ($isView && !$views) {
+            if (($isView && !$views) || isset($hidden[$full])) {
                 continue;
             }
             $fk = null;

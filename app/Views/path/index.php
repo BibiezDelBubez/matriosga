@@ -1,11 +1,11 @@
 <?php
 /**
- * @var string $from @var string $to @var array $opt @var string $avoid
+ * @var string $from @var string $to @var array $opt @var string $avoid @var array $noise
  * @var ?array $result PathFinderService::find @var list<string> $sql @var list<string> $pq
  */
 $toggleUrl = static fn (array $change) => url('/path', array_merge([
     'from' => $from, 'to' => $to, 'depth' => $opt['depth'], 'cand' => $opt['candidates'] ? 1 : null,
-    'score' => $opt['minScore'], 'hubs' => $opt['hubs'] ? 1 : null, 'avoid' => $avoid,
+    'score' => $opt['minScore'], 'hubs' => $opt['hubs'] ? 1 : null, 'avoid' => $avoid, 'all' => $noise['all'] ? 1 : null,
 ], $change));
 ?>
 <div class="page-head">
@@ -55,6 +55,7 @@ $toggleUrl = static fn (array $change) => url('/path', array_merge([
                 <input class="form-check-input" type="checkbox" role="switch" id="hubs" name="hubs" value="1"<?= $opt['hubs'] ? ' checked' : '' ?>>
                 <label class="form-check-label" for="hubs">Passa anche da tabelle hub <span class="text-secondary">(BaSocieta, BaCliFor…)</span></label>
             </div>
+            <?= $this->partial('partials/show_all', ['noise' => $noise]) ?>
             <div class="d-flex align-items-center gap-2 flex-grow-1">
                 <label for="avoid" class="text-nowrap">Evita:</label>
                 <input class="form-control form-control-sm ident" id="avoid" name="avoid" value="<?= e($avoid) ?>" placeholder="tabelle da non attraversare, separate da virgola">

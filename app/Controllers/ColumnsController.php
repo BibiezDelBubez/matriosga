@@ -27,7 +27,9 @@ final class ColumnsController extends Controller
         $category = $request->enum('cat', array_keys(Column::CATEGORY_LABELS), '');
         $views = $request->bool('views', true);
 
-        $result = $query === '' ? null : $this->search->search($this->cache->catalog(), $query, $mode, $category, $views);
+        $catalog = $this->cache->catalog();
+        $noise = $this->noiseFilter($request, $catalog);
+        $result = $query === '' ? null : $this->search->search($catalog, $query, $mode, $category, $views, $noise['hidden']);
         $pager = null;
         if ($result !== null) {
             $pager = new Pager($request->int('page', 1, 1), (int) setting('limits.page_size', 100), count($result['rows']));
@@ -41,6 +43,7 @@ final class ColumnsController extends Controller
             'category' => $category,
             'views'    => $views,
             'result'     => $result,
+            'noise'      => $noise,
             'pager'      => $pager,
             'modes'      => Sql::MATCH_MODES,
             'categories' => Column::CATEGORY_LABELS,

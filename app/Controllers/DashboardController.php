@@ -34,6 +34,7 @@ final class DashboardController extends Controller
             try {
                 $catalog = $this->cache->catalog();
                 $data['stats'] = $catalog->stats();
+                $data['noise'] = $this->noiseFilter($request, $catalog)['counts'];
                 $data['server'] = $catalog->server();
                 $data['cachedAt'] = $catalog->cachedAt();
             } catch (Throwable $e) {

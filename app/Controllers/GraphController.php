@@ -28,6 +28,7 @@ final class GraphController extends Controller
             'hubs'    => $request->bool('hubs'),
             'path'    => $request->str('path'),
             'nodes'   => $request->str('nodes'),
+            'noise'   => $this->noiseFilter($request, $this->cache->catalog()),
             'scripts' => ['cytoscape', 'js/graph.js'],
         ]);
     }
@@ -46,6 +47,7 @@ final class GraphController extends Controller
             $request->bool('hubs'),
             (int) setting('limits.graph_max_nodes', 150),
             $extra,
+            $this->noiseFilter($request, $catalog)['hidden'],
         ));
     }
 }

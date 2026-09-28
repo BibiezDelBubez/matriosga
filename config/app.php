@@ -36,6 +36,12 @@ return [
         'read_uncommitted'         => true,   // non blocca il gestionale durante le letture
     ],
 
+    // Tabelle "rumore" nascoste di default in tutte le pagine (ogni pagina ha l'interruttore per mostrarle).
+    'filters' => [
+        'hide_empty'  => true,   // 0 righe (su SGA circa 9 tabelle su 10)
+        'hide_copies' => true,   // copie di sicurezza riconosciute dal nome (Save_…, …_SAVE_2019_…, XXBeforeRepair_…)
+    ],
+
     'limits' => [
         'search_batch_tables'   => 20,        // tabelle per chiamata AJAX nella ricerca valore
         'search_max_table_rows' => 5000000,   // tabelle più grandi saltate (forzabile)
@@ -92,6 +98,12 @@ return [
             'desc' => 'Come collegare la tabella A alla B',
             'keywords' => ['percorso', 'collegare', 'collegate', 'cammino', 'da a', 'join', 'legame', 'come arrivo', 'catena', 'passaggi'],
             'questions' => ['Queste due tabelle sono collegate? Da cosa?', 'Esiste un percorso tra la tabella A e la tabella B?'],
+        ],
+        [
+            'path' => '/queries', 'label' => 'Query di SGA', 'icon' => 'fa-scroll', 'home' => true, 'ready' => true,
+            'desc' => 'Come SGA stesso usa una tabella o colonna',
+            'keywords' => ['query', 'vista', 'viste', 'funzione', 'funzioni', 'trigger', 'procedura', 'codice', 'logica', 'calcolo', 'come usa', 'come calcola', 'esempio', 'sql di sga', 'zucchetti'],
+            'questions' => ['Come usa SGA questa tabella?', 'Quali query del gestionale collegano queste tabelle?', 'Come calcola SGA questo valore?'],
         ],
         [
             'path' => '/graph', 'label' => 'Grafo', 'icon' => 'fa-diagram-project', 'home' => true, 'ready' => true,

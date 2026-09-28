@@ -3,11 +3,11 @@
     'use strict';
 
     const MAX = 300;
-    // Riga: [nome, tipo, righe, ncolonne, pk, fkOut, fkIn, descrizione]
+    // Riga: [nome, tipo, righe, ncolonne, pk, fkOut, fkIn, descrizione, vuota/copia (1/0)]
     const data = JSON.parse(document.getElementById('tables-data').textContent);
     const search = data.map(r => Matriosga.norm(r[0] + ' ' + r[7]));
     const $ = id => document.getElementById(id);
-    const filter = $('tables-filter'), type = $('tables-type'), schema = $('tables-schema'), nonEmpty = $('tables-nonempty');
+    const filter = $('tables-filter'), type = $('tables-type'), schema = $('tables-schema'), showAll = $('tables-all');
     const tbody = document.querySelector('#tables-list tbody');
     let sortKey = 0, sortDir = 1, limit = MAX;
 
@@ -18,7 +18,7 @@
         data.forEach((r, i) => {
             if (type.value && r[1] !== type.value) return;
             if (schema && schema.value && !r[0].startsWith(schema.value + '.')) return;
-            if (nonEmpty.checked && !(r[2] > 0)) return;
+            if (!showAll.checked && r[8]) return;
             if (!tokens.every(t => search[i].includes(t))) return;
             rows.push(r);
         });
@@ -65,6 +65,6 @@
         render();
     }));
     filter.addEventListener('input', Matriosga.debounce(() => render(), 100));
-    [type, schema, nonEmpty].forEach(el => el && el.addEventListener('change', () => render()));
+    [type, schema, showAll].forEach(el => el && el.addEventListener('change', () => render()));
     render();
 })();

@@ -72,6 +72,16 @@ Se una sessione si interrompe: riprendere dal primo passo non spuntato.
 - [x] 5.0d Revisione MVC/DRY: niente logica/servizi nelle viste, niente JS inline, `QueryTextService::joins()`,
       `RelationshipService::forTable()`, partial fk_rules/mode_buttons, cols_a/cols_b calcolati una volta nel PathFinder;
       elenco tabelle con "Mostra altre 300"
+- [x] 5.0e storage/: password in secrets.json (separata da settings.json), chiave app.key spostabile (security.key_file),
+      storage/.gitignore + README, log tenuti 30 giorni. Repository privato GitHub BibiezDelBubez/matriosga (primo push fatto)
+- [x] 6.1 Tabelle vuote e copie di sicurezza nascoste di default ovunque (`TableFilterService`, interruttore
+      `partials/show_all`, parametro `?all=1`, default in Impostazioni). SGA: visibili 892 su 8.614
+- [x] 6.2 "Query di SGA" (`/queries`, `SqlModuleService`): ricerca parola intera in viste/funzioni/trigger, estratti
+      evidenziati, codice completo, SQL/Power Query per viste e funzioni tabella; pagina "permesso mancante" con GRANT
+      da girare al DBA. Link «Come la usa SGA» nel dettaglio tabella. Testato offline + pagina senza permesso.
+      **Da verificare dal vivo** quando il DBA darà `GRANT VIEW DEFINITION TO [sql01]` (336 query, 0 leggibili al 28/09/2026)
+- [ ] 6.3 Altre idee concordate col cliente: Spia modifiche (prima/dopo un'operazione in SGA), Decodifica codici,
+      Costruttore query multi-tabella, Note personali, Recenti
 - [ ] 5.1 Controllo "nessun URL esterno" (grep), log durata query, pulizia
 - [ ] 5.2 Ottimizzazioni performance su DB reale (es. binding varchar vs nvarchar nei parametri per usare gli indici in modalità "uguale")
 - [ ] 5.3 (se OPcache attivo) cache `core` come file PHP (var_export) in memoria condivisa: -120 ms per richiesta

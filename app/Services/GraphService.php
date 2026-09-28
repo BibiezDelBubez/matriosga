@@ -20,10 +20,12 @@ final class GraphService
 
     /**
      * @param list<string> $extra nodi da includere comunque (es. tabelle già presenti nel grafo del browser)
-     * @return array{nodes: list<array>, edges: list<array>, truncated: bool, hidden_hubs: int}
+     * @param array<string, true> $hidden tabelle da non mostrare (vuote/copie), salvo il centro
+     * @return array{nodes: list<array>, edges: list<array>, truncated: bool, hidden_hubs: int, hidden_noise: int}
      */
-    public function neighborhood(Catalog $catalog, string $center, int $depth, bool $candidates, bool $hubs, int $maxNodes, array $extra = []): array
+    public function neighborhood(Catalog $catalog, string $center, int $depth, bool $candidates, bool $hubs, int $maxNodes, array $extra = [], array $hidden = []): array
     {
+        $hiddenNoise = [];
         $edges = $this->relations->edges($catalog, $candidates, 80);
         $inDegree = $this->relations->inDegree($catalog);
         $isHub = static fn (string $t) => ($inDegree[$t] ?? 0) > RelationshipService::HUB_IN;
@@ -49,6 +51,10 @@ final class GraphService
                 }
                 foreach (array_keys($adj[$u] ?? []) as $v) {
                     if (isset($level[$v])) {
+                        continue;
+                    }
+                    if (isset($hidden[$v])) {
+                        $hiddenNoise[$v] = true;
                         continue;
                     }
                     if (!$hubs && $isHub($v)) {
@@ -115,6 +121,6 @@ final class GraphService
                 ], $rels),
             ]];
         }
-        return ['nodes' => $nodes, 'edges' => $out, 'truncated' => $truncated, 'hidden_hubs' => count($hiddenHubs)];
+        return ['nodes' => $nodes, 'edges' => $out, 'truncated' => $truncated, 'hidden_hubs' => count($hiddenHubs), 'hidden_noise' => count($hiddenNoise)];
     }
 }

@@ -1,5 +1,5 @@
 <?php
-/** @var string $table @var int $depth @var bool $cand @var bool $hubs @var string $path @var string $nodes (nodi extra, separati da virgola) */
+/** @var string $table @var int $depth @var bool $cand @var bool $hubs @var string $path @var string $nodes (nodi extra, separati da virgola) @var array $noise */
 ?>
 <div class="page-head mb-2">
     <div>
@@ -22,6 +22,7 @@
             <input class="form-check-input" type="checkbox" role="switch" id="g-hubs" name="hubs" value="1"<?= $hubs ? ' checked' : '' ?>>
             <label class="form-check-label" for="g-hubs">Tabelle hub</label>
         </div>
+        <?= $this->partial('partials/show_all', ['noise' => $noise, 'id' => 'g-all']) ?>
         <button class="btn btn-primary btn-sm" type="submit"><i class="fa-solid fa-play"></i> Mostra</button>
         <span class="vr mx-1"></span>
         <input class="form-control form-control-sm ident" style="max-width: 200px" id="g-find" placeholder="Trova nel grafo…">

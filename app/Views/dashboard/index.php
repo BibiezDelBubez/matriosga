@@ -54,6 +54,13 @@ $tools = array_filter(setting('menu', []), static fn (array $m) => $m['home']);
         <?php endforeach; ?>
     </div>
 
+    <?php if ($noise['hidden']): ?>
+        <?= $this->partial('partials/alert', ['type' => 'info', 'message' => sprintf(
+            'Con dati utili: <strong>%s</strong> tabelle e viste. Nascoste di default <strong>%s</strong> tabelle vuote e <strong>%s</strong> copie di sicurezza (riconosciute dal nome): ogni pagina ha l\'interruttore «Mostra anche tabelle vuote e copie».',
+            e(fmt_int($stats['tables'] + $stats['views'] - $noise['hidden'])), e(fmt_int($noise['empty'])), e(fmt_int($noise['copies'])),
+        )]) ?>
+    <?php endif; ?>
+
     <?php if ($stats['fks'] === 0): ?>
         <?= $this->partial('partials/alert', ['type' => 'info', 'message' => 'Il database non ha foreign key dichiarate: per collegare le tabelle usa le <strong>relazioni candidate</strong> (Relazioni / Percorso).']) ?>
     <?php endif; ?>

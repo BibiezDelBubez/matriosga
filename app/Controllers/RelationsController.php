@@ -28,6 +28,7 @@ final class RelationsController extends Controller
         $from = $request->str('from') !== '' ? $catalog->require($request->str('from'))->fullName : null;
         $to = $request->str('to') !== '' ? $catalog->require($request->str('to'))->fullName : null;
         $hubs = $request->bool('hubs');
+        $noise = $this->noiseFilter($request, $catalog);
 
         $result = null;
         $pager = null;
@@ -36,7 +37,7 @@ final class RelationsController extends Controller
             $source = $kind === 'candidates'
                 ? $this->relations->candidatesFor($catalog, $hubs)
                 : $this->relations->declared($catalog, $from, $to);
-            $result = $this->relations->filter($source, $query, $from, $to);
+            $result = $this->relations->filter($this->relations->withoutTables($source, $noise['hidden']), $query, $from, $to);
             $pager = new Pager($request->int('page', 1, 1), (int) setting('limits.page_size', 100), $result['total']);
             $result['rows'] = $pager->slice($result['rows']);
             $joins = $this->queryText->joins($catalog, $result['rows']); // solo per la pagina mostrata
@@ -49,6 +50,7 @@ final class RelationsController extends Controller
             'from'    => $from,
             'to'      => $to,
             'hubs'    => $hubs,
+            'noise'   => $noise,
             'result'  => $result,
             'joins'   => $joins,
             'pager'   => $pager,

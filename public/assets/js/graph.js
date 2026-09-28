@@ -46,7 +46,7 @@
     let center = null;
 
     function options() {
-        return { depth: +$('g-depth').value, cand: $('g-cand').checked, hubs: $('g-hubs').checked };
+        return { depth: +$('g-depth').value, cand: $('g-cand').checked, hubs: $('g-hubs').checked, all: $('g-all').checked };
     }
 
     function syncUrl() {
@@ -56,6 +56,7 @@
         url.searchParams.set('depth', o.depth);
         o.cand ? url.searchParams.set('cand', 1) : url.searchParams.delete('cand');
         o.hubs ? url.searchParams.set('hubs', 1) : url.searchParams.delete('hubs');
+        o.all ? url.searchParams.set('all', 1) : url.searchParams.delete('all');
         url.searchParams.delete('nodes');
         url.searchParams.delete('path');
         history.replaceState(null, '', url);
@@ -67,7 +68,7 @@
         status.textContent = 'Caricamento…';
         try {
             const existing = expand ? cy.nodes().map(n => n.id()) : [];
-            const d = await Matriosga.api('/api/graph', { body: { t: table, depth: depth ?? o.depth, cand: o.cand, hubs: o.hubs, extra: existing.concat(extra) } });
+            const d = await Matriosga.api('/api/graph', { body: { t: table, depth: depth ?? o.depth, cand: o.cand, hubs: o.hubs, all: o.all, extra: existing.concat(extra) } });
             if (!expand) {
                 cy.elements().remove();
                 center = d.nodes.find(n => n.data.center)?.data.id ?? table;
@@ -80,6 +81,7 @@
             let msg = `${cy.nodes().length} tabelle, ${cy.edges().length} relazioni.`;
             if (d.truncated) msg += ' Limite nodi raggiunto: aumenta «Grafo: nodi massimi» in Impostazioni o riduci i livelli.';
             if (d.hidden_hubs) msg += ` ${d.hidden_hubs} tabelle hub nascoste.`;
+            if (d.hidden_noise) msg += ` ${d.hidden_noise} tabelle vuote o copie nascoste.`;
             status.textContent = msg;
             if (!expand) syncUrl();
         } catch (e) {
