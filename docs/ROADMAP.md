@@ -80,8 +80,14 @@ Se una sessione si interrompe: riprendere dal primo passo non spuntato.
       evidenziati, codice completo, SQL/Power Query per viste e funzioni tabella; pagina "permesso mancante" con GRANT
       da girare al DBA. Link «Come la usa SGA» nel dettaglio tabella. Testato offline + pagina senza permesso.
       **Da verificare dal vivo** quando il DBA darà `GRANT VIEW DEFINITION TO [sql01]` (336 query, 0 leggibili al 28/09/2026)
-- [ ] 6.3 Altre idee concordate col cliente: Spia modifiche (prima/dopo un'operazione in SGA), Decodifica codici,
-      Costruttore query multi-tabella, Note personali, Recenti
+- [x] 6.3 Dashboard: numeri grandi = solo tabelle con dati (860 su 8.582), card "Tabelle nascoste"
+- [x] 6.4 Spia modifiche (`/spy`, `SpyService`): generica SQL Server. Conteggi prima/dopo su tutte le tabelle (~2 s),
+      rowversion (@@DBTS), colonne data/utente configurabili (config spy). Filtro facoltativo per utente.
+      Su Sgam2: 342 tabelle controllabili riga per riga in ~9 s. Nessun permesso extra richiesto
+- [-] 6.5 Decodifica codici — **sospesa (28/09/2026)**: l'utente vuole funzioni generiche, non basate su come SGA salva le descrizioni
+- [ ] 6.6 **Costruttore di query multi-tabella** (richiesto con entusiasmo): scegli tabelle → percorso automatico →
+      scegli colonne → un'unica SELECT con JOIN + Power Query
+- [ ] 6.7 Idee restanti: Note personali, Recenti. Valutare nomi più generici per "Query di SGA" (es. "Query nel database")
 - [ ] 5.1 Controllo "nessun URL esterno" (grep), log durata query, pulizia
 - [ ] 5.2 Ottimizzazioni performance su DB reale (es. binding varchar vs nvarchar nei parametri per usare gli indici in modalità "uguale")
 - [ ] 5.3 (se OPcache attivo) cache `core` come file PHP (var_export) in memoria condivisa: -120 ms per richiesta

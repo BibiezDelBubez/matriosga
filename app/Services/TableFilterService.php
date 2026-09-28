@@ -63,6 +63,29 @@ final class TableFilterService
         ];
     }
 
+    /**
+     * Conteggi per la dashboard sulle sole tabelle/viste visibili (filtri di default) e sul totale.
+     * @return array<string, array{useful: int, total: int}>
+     */
+    public function dashboardStats(Catalog $catalog): array
+    {
+        $hidden = $this->hidden($catalog);
+        $s = ['tables' => [0, 0], 'views' => [0, 0], 'columns' => [0, 0], 'pks' => [0, 0], 'fks' => [0, 0]];
+        foreach ($catalog->objects() as $full => $o) {
+            $useful = !isset($hidden[$full]);
+            $kind = $o['type'] === 'V' ? 'views' : 'tables';
+            foreach ([$kind => 1, 'columns' => $o['ncols'], 'pks' => $o['pk'] ? 1 : 0] as $key => $n) {
+                $s[$key][1] += $n;
+                $s[$key][0] += $useful ? $n : 0;
+            }
+        }
+        foreach ($catalog->fks() as $fk) {
+            $s['fks'][1]++;
+            $s['fks'][0] += isset($hidden[$fk['from']]) || isset($hidden[$fk['to']]) ? 0 : 1;
+        }
+        return array_map(static fn (array $p) => ['useful' => $p[0], 'total' => $p[1]], $s);
+    }
+
     /** Motivo per cui una tabella è considerata copia, o null. */
     public function copyReason(Catalog $catalog, string $full): ?string
     {

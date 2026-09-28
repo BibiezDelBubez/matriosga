@@ -42,6 +42,18 @@ return [
         'hide_copies' => true,   // copie di sicurezza riconosciute dal nome (Save_…, …_SAVE_2019_…, XXBeforeRepair_…)
     ],
 
+    /*
+     * Spia modifiche: nomi delle colonne "quando/chi" (confronto senza maiuscole; vale il primo trovato).
+     * Default: convenzione SGA + nomi comuni. Per un altro database basta cambiare le liste.
+     * Le colonne rowversion/timestamp di SQL Server sono riconosciute sempre, senza configurazione.
+     */
+    'spy' => [
+        'insert_columns'      => ['INSERT_DATA_ORA', 'CreatedAt', 'CreatedOn', 'CreatedDate', 'CreationDate', 'DataCreazione', 'DATA_INSERIMENTO', 'DataInserimento', 'InsertDate'],
+        'update_columns'      => ['UPDATE_DATA_ORA', 'UpdatedAt', 'ModifiedAt', 'ModifiedOn', 'ModifiedDate', 'LastModified', 'DataModifica', 'DATA_MODIFICA', 'DATA_ULTIMA_MODIFICA', 'UpdateDate'],
+        'insert_user_columns' => ['INSERT_UTENTE', 'CreatedBy', 'UtenteCreazione', 'UTENTE_INSERIMENTO', 'InsertUser'],
+        'update_user_columns' => ['UPDATE_UTENTE', 'ModifiedBy', 'UpdatedBy', 'UtenteModifica', 'UTENTE_MODIFICA', 'UpdateUser'],
+    ],
+
     'limits' => [
         'search_batch_tables'   => 20,        // tabelle per chiamata AJAX nella ricerca valore
         'search_max_table_rows' => 5000000,   // tabelle più grandi saltate (forzabile)
@@ -98,6 +110,12 @@ return [
             'desc' => 'Come collegare la tabella A alla B',
             'keywords' => ['percorso', 'collegare', 'collegate', 'cammino', 'da a', 'join', 'legame', 'come arrivo', 'catena', 'passaggi'],
             'questions' => ['Queste due tabelle sono collegate? Da cosa?', 'Esiste un percorso tra la tabella A e la tabella B?'],
+        ],
+        [
+            'path' => '/spy', 'label' => 'Spia modifiche', 'icon' => 'fa-user-secret', 'home' => true, 'ready' => true,
+            'desc' => 'Quali tabelle cambia il gestionale quando fai un\'operazione',
+            'keywords' => ['spia', 'modifiche', 'cosa cambia', 'dove scrive', 'dove salva', 'traccia', 'prima dopo', 'operazione', 'inserimento', 'registrazione', 'nuove righe', 'monitor'],
+            'questions' => ['Dove salva il gestionale questa operazione?', 'Quali tabelle cambiano quando registro una fattura?'],
         ],
         [
             'path' => '/queries', 'label' => 'Query di SGA', 'icon' => 'fa-scroll', 'home' => true, 'ready' => true,

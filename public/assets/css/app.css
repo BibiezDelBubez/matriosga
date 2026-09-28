@@ -62,6 +62,9 @@ body { background: var(--mt-bg); font-size: .925rem; }
 .stat-card .stat-value { font-size: 1.6rem; font-weight: 700; line-height: 1.1; }
 .stat-card .stat-label { color: #6b7385; font-size: .8rem; text-transform: uppercase; letter-spacing: .04em; }
 .stat-card .stat-icon { font-size: 1.3rem; color: var(--mt-accent); opacity: .8; }
+a.stat-card:hover { border-color: var(--mt-accent); }
+.stat-card.stat-muted { background: #f8f9fb; }
+.stat-card.stat-muted .stat-value, .stat-card.stat-muted .stat-icon { color: #8a93a6; }
 
 .tool-btn {
     display: flex; gap: .9rem; align-items: center; padding: 1.1rem 1.2rem; height: 100%;
@@ -237,6 +240,11 @@ th[data-dir="desc"]::after { content: " ▼"; font-size: .7em; }
     padding: .4rem .6rem; margin: .3rem 0 0; white-space: pre-wrap; overflow-wrap: anywhere; max-height: 9em; overflow: auto; }
 .snippet mark, .code-block mark { background: #ffe58a; color: #1f2433; padding: 0 1px; border-radius: 2px; }
 .code-block.code-tall { max-height: 60vh; }
+
+/* Spia modifiche */
+.spy-step { width: 34px; height: 34px; flex: 0 0 34px; border-radius: 50%; display: grid; place-items: center; background: var(--mt-accent-soft); color: var(--mt-accent); font-weight: 700; }
+.spy-pulse { font-size: 2.2rem; color: #198754; animation: spy-pulse 1.6s ease-in-out infinite; }
+@keyframes spy-pulse { 50% { opacity: .35; } }
 
 /* Griglia dati */
 .data-grid { max-height: 60vh; overflow: auto; }

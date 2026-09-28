@@ -9,6 +9,7 @@ use App\Core\Response;
 use App\Core\Settings;
 use App\Services\EnvironmentService;
 use App\Services\MetadataCache;
+use App\Services\TableFilterService;
 use Throwable;
 
 final class DashboardController extends Controller
@@ -17,6 +18,7 @@ final class DashboardController extends Controller
         private readonly Settings $settings,
         private readonly MetadataCache $cache,
         private readonly EnvironmentService $environment,
+        private readonly TableFilterService $filter,
     ) {
     }
 
@@ -35,6 +37,7 @@ final class DashboardController extends Controller
                 $catalog = $this->cache->catalog();
                 $data['stats'] = $catalog->stats();
                 $data['noise'] = $this->noiseFilter($request, $catalog)['counts'];
+                $data['useful'] = $this->filter->dashboardStats($catalog);
                 $data['server'] = $catalog->server();
                 $data['cachedAt'] = $catalog->cachedAt();
             } catch (Throwable $e) {

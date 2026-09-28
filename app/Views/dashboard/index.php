@@ -33,33 +33,42 @@ $tools = array_filter(setting('menu', []), static fn (array $m) => $m['home']);
         </div>
     </div>
 
-    <div class="row g-3 mb-4">
+    <?php // Numero grande = ciò che serve davvero (tabelle con dati, non copie); il totale del database resta sotto, in piccolo. ?>
+    <div class="row g-3 mb-2">
         <?php foreach ([
-            ['Tabelle', $stats['tables'], 'fa-table'],
-            ['Viste', $stats['views'], 'fa-eye'],
-            ['Colonne', $stats['columns'], 'fa-table-columns'],
-            ['Chiavi primarie', $stats['pks'], 'fa-key'],
-            ['Foreign key', $stats['fks'], 'fa-link'],
-            ['Indici', $stats['indexes'], 'fa-bolt'],
-        ] as [$label, $value, $icon]): ?>
+            ['Tabelle con dati', 'tables', 'fa-table', url('/tables')],
+            ['Viste', 'views', 'fa-eye', url('/tables')],
+            ['Colonne', 'columns', 'fa-table-columns', null],
+            ['Chiavi primarie', 'pks', 'fa-key', null],
+            ['Foreign key', 'fks', 'fa-link', url('/relations')],
+        ] as [$label, $key, $icon, $link]): ?>
             <div class="col-6 col-md-4 col-xl-2">
-                <div class="card stat-card h-100">
+                <<?= $link ? 'a href="' . e($link) . '"' : 'div' ?> class="card stat-card h-100 text-decoration-none text-reset">
                     <div class="d-flex justify-content-between">
                         <div class="stat-label"><?= e($label) ?></div>
                         <i class="fa-solid <?= e($icon) ?> stat-icon"></i>
                     </div>
-                    <div class="stat-value"><?= e(fmt_int($value)) ?></div>
-                </div>
+                    <div class="stat-value"><?= e(fmt_int($useful[$key]['useful'])) ?></div>
+                    <?php if ($useful[$key]['useful'] !== $useful[$key]['total']): ?>
+                        <div class="small text-secondary">su <?= e(fmt_int($useful[$key]['total'])) ?> nel database</div>
+                    <?php endif; ?>
+                </<?= $link ? 'a' : 'div' ?>>
             </div>
         <?php endforeach; ?>
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="card stat-card h-100 stat-muted">
+                <div class="d-flex justify-content-between">
+                    <div class="stat-label">Tabelle nascoste</div>
+                    <i class="fa-regular fa-eye-slash stat-icon"></i>
+                </div>
+                <div class="stat-value"><?= e(fmt_int($noise['hidden'])) ?></div>
+                <div class="small text-secondary"><?= e(fmt_int($noise['empty'])) ?> vuote, <?= e(fmt_int($noise['copies'])) ?> copie (molte copie sono anche vuote)</div>
+            </div>
+        </div>
     </div>
-
-    <?php if ($noise['hidden']): ?>
-        <?= $this->partial('partials/alert', ['type' => 'info', 'message' => sprintf(
-            'Con dati utili: <strong>%s</strong> tabelle e viste. Nascoste di default <strong>%s</strong> tabelle vuote e <strong>%s</strong> copie di sicurezza (riconosciute dal nome): ogni pagina ha l\'interruttore «Mostra anche tabelle vuote e copie».',
-            e(fmt_int($stats['tables'] + $stats['views'] - $noise['hidden'])), e(fmt_int($noise['empty'])), e(fmt_int($noise['copies'])),
-        )]) ?>
-    <?php endif; ?>
+    <p class="small text-secondary mb-4"><i class="fa-solid fa-circle-info"></i>
+        I numeri grandi contano solo le tabelle <strong>con dati</strong>: le tabelle vuote e le copie di sicurezza (riconosciute dal nome, es. <span class="ident">Save_…</span>, <span class="ident">XXBeforeRepair_…</span>)
+        sono nascoste in tutte le pagine. Per vederle usa l'interruttore «Mostra anche tabelle vuote e copie» o cambia il default in <a href="<?= e(url('/settings')) ?>">Impostazioni</a>.</p>
 
     <?php if ($stats['fks'] === 0): ?>
         <?= $this->partial('partials/alert', ['type' => 'info', 'message' => 'Il database non ha foreign key dichiarate: per collegare le tabelle usa le <strong>relazioni candidate</strong> (Relazioni / Percorso).']) ?>
