@@ -1,95 +1,91 @@
 # Matriosga
 
-Esploratore **offline** della struttura e dei dati di un database **SGA (Sima / Zucchetti)** su
-SQL Server, pensato per chi costruisce report Power BI / Power Query.
-Sola lettura: non modifica mai il database.
+**Trova in pochi minuti dove sta un dato nel database del gestionale e come collegarlo, fino alla query pronta per Power BI.**
 
-## 1. Prerequisiti
+Pensato per chi fa **analisi e report**, non per programmatori: si parte da una domanda
+("dove sta questo dato?", "come collego viaggi e clienti?") e non serve conoscere il database.
 
-- XAMPP con **PHP 8.1+** (testato con PHP 8.2.12)
-- Estensione **pdo_sqlsrv** per la tua versione di PHP (Microsoft Drivers for PHP for SQL Server)
-- **Microsoft ODBC Driver 17 o 18 for SQL Server** (64 bit)
-- Nessuna connessione Internet necessaria; MySQL non serve
+- Funziona su **SQL Server** (nato per il gestionale SGA, ma vale per qualsiasi database SQL Server).
+- **Legge e basta**: non modifica mai niente nel database.
+- Gira **in locale, senza Internet**, su XAMPP.
 
-### Estensione pdo_sqlsrv
+---
 
-1. Copiare `php_pdo_sqlsrv_82_ts.dll` (versione adatta al proprio PHP: `82` = PHP 8.2, `ts` = thread safe, come XAMPP) in `xampp\php\ext\`.
-2. In `xampp\php\php.ini` aggiungere:
-   ```ini
-   extension=php_pdo_sqlsrv_82_ts.dll
-   ```
-3. Riavviare Apache. Verifica: `php -m` deve elencare `pdo_sqlsrv`.
+## Cosa ci fai
 
-Se manca il driver ODBC, "Testa connessione" mostra un errore esplicito.
+| Domanda | Funzione |
+|---|---|
+| In quale tabella c'è questo codice / nome file / P.IVA? | **Cerca valore** |
+| Cosa c'è in questa tabella? Quali sono le chiavi? | **Tabelle** |
+| In quali tabelle esiste un campo con questo nome? | **Colonne** |
+| Come si collega la tabella A alla tabella B? | **Percorso** e **Grafo** |
+| Mi dai la query pronta, con le JOIN giuste? | **Costruttore query** |
+| Quali valori ci sono in questa colonna? Quanti vuoti? | **Analisi** |
+| Dove scrive il gestionale quando faccio un'operazione? | **Spia modifiche** |
+| Come usa il gestionale stesso questa tabella? | **Query di SGA** |
+| Due tabelle si collegano in un modo che il database non dichiara? | **Relazioni → Definite da te** |
 
-## 2. Installazione
+Tabelle vuote e copie di sicurezza (es. `Save_…`, `XXBeforeRepair_…`) sono **nascoste di default**:
+vedi solo quelle con dati. Ogni pagina ha l'interruttore «Mostra anche tabelle vuote e copie».
 
-Copiare la cartella del progetto in `C:\xampp\htdocs\` (es. `C:\xampp\htdocs\matriosga`),
-avviare Apache e aprire `http://localhost/matriosga/`
-(se Apache usa un'altra porta, es. 8080: `http://localhost:8080/matriosga/`).
+## Come si usa
 
-Serve `mod_rewrite` attivo e `AllowOverride All` su htdocs (default di XAMPP).
-La cartella `storage/` deve essere scrivibile da Apache.
+1. Apri l'indirizzo di Matriosga nel browser (es. `http://192.168.31.32/matriosga/`).
+2. **Scrivi nella barra di ricerca quello che ti serve**, anche come domanda: ti porta alla funzione giusta.
+   Se scrivi un nome, puoi cercarlo subito come valore, tabella o colonna.
+3. Ovunque trovi pulsanti per **copiare** nomi, SQL e Power Query.
 
-> Sviluppo: invece di copiare si può creare una junction
-> `mklink /J C:\xampp\htdocs\matriosga C:\percorso\Matriosga`.
+---
 
-## 3. Librerie CSS/JS locali
+## Installazione (per chi la mette su un PC o una VM)
 
-Tutte le librerie stanno in `public/assets/vendor/` e sono referenziate **solo** da
-`config/assets.php`. Per aggiornarne una: sostituire il file (stesso nome) oppure cambiare il percorso in `config/assets.php`.
+1. Installa **XAMPP** (PHP 8.2, 64 bit) e **Microsoft ODBC Driver 18 for SQL Server** (x64).
+2. Copia la cartella di Matriosga in `xampp\htdocs\` (es. `xampp\htdocs\matriosga`).
+3. Avvia **Apache** e apri `http://localhost/matriosga/` (se Apache usa un'altra porta: `http://localhost:8080/matriosga/`).
+4. Vai in **Impostazioni → Ambiente server**: controlla da sola cosa manca (driver PHP per SQL Server,
+   permessi, memoria…) e per ogni voce rossa o gialla ti dice **esattamente cosa fare** e cosa copiare.
+5. Vai in **Impostazioni → Connessione**, inserisci server e database, premi **Testa connessione**, poi **Salva**.
+6. Apri la **Dashboard**: la prima volta legge la struttura del database (circa un minuto).
 
-| Libreria | Cartella | File usati |
+Quando la struttura del database cambia, premi **Aggiorna metadata** in alto a destra.
+
+**Consigli**
+- Usa un utente SQL **di sola lettura** (`db_datareader`). Per la funzione «Query di SGA» serve anche
+  `VIEW DEFINITION` (la pagina stessa mostra la riga da girare al DBA).
+- Per più velocità attiva **OPcache** (in `php.ini`) e **mod_deflate** (in `httpd.conf`): istruzioni in Ambiente server.
+
+## Dove stanno i dati
+
+Tutto in file nella cartella `storage\`. Nel database non viene scritto niente.
+
+| File | Contenuto | Se lo perdi |
 |---|---|---|
-| Bootstrap 5 | `vendor/bootstrap/` | `css/bootstrap.min.css`, `js/bootstrap.bundle.js` |
-| Font Awesome | `vendor/fontawesome/` | `css/all.min.css` + `webfonts/*.woff2` (la struttura `css/` + `webfonts/` va mantenuta) |
-| Cytoscape.js | `vendor/cytoscape/` | `cytoscape.min.js` (grafo relazioni) |
+| `relations.json` | **le relazioni definite da te** | le perdi: **è l'unico file da salvare davvero** |
+| `settings.json` | connessione e impostazioni (senza password) | reinserisci la connessione |
+| `secrets.json` + `app.key` | password cifrata + chiave per leggerla | reinserisci la password |
+| `cache\` | copia della struttura del database | si ricrea da sola |
+| `logs\` | errori e query lente (30 giorni) | nessun problema |
 
-Nessun CDN, nessun font remoto: l'app funziona senza Internet.
+Il lavoro in corso nel **Costruttore query** resta nel browser, non in questa cartella.
+Dettagli e sicurezza della password: `storage\README.md`.
 
-## 4. Configurazione database
+## Spostarla su un'altra macchina
 
-Menu **Impostazioni → Connessione database**: server (`NOME`, `NOME\ISTANZA` o IP), porta opzionale,
-database, autenticazione SQL o Windows, schema predefinito, timeout.
+- **Copiando la cartella intera**: i dati arrivano con lei. In Impostazioni scrivi il server **esattamente
+  come prima** (stesso nome o stesso IP), altrimenti le relazioni definite da te non compaiono.
+- **Con `git clone` da GitHub**: `storage\` arriva vuota (i file locali non vanno mai su GitHub).
+  Copia a mano dalla vecchia macchina `relations.json`, `settings.json`, `secrets.json` e `app.key`,
+  oppure reinserisci la connessione.
 
-- I valori sono salvati in `storage/settings.json` (senza password; esempio in `storage/settings.example.json`).
-- La password sta a parte in `storage/secrets.json`, cifrata con la chiave `app.key`; non viene mai mostrata né loggata.
-  Consigliato spostare `app.key` fuori dal progetto (`config/app.php` → `security.key_file`). Dettagli in `storage/README.md`.
-- **Consigliato**: un login SQL dedicato con solo `db_datareader` (+ `VIEW DEFINITION` per vedere tutti i metadata).
-- **ODBC Driver 18** cifra per default: se il server non ha un certificato valido lasciare attivo *TrustServerCertificate*.
-- **Autenticazione Windows**: usa l'account con cui gira Apache. Se Apache è avviato come servizio è l'account di sistema, quindi conviene un login SQL.
-- *READ UNCOMMITTED* (default attivo) evita di bloccare il gestionale durante le letture.
+In entrambi i casi, dopo: **Impostazioni → Ambiente server** e sistema le voci rosse.
 
-## 5. Test connessione
+---
 
-Nella stessa pagina, **Testa connessione** prova i valori del form (anche prima di salvarli) e
-mostra server, database, utente, versione SQL Server e collation, oppure l'errore dettagliato.
+## Per chi sviluppa
 
-## 6. Primo utilizzo
-
-1. Salvare la connessione.
-2. Aprire la **Dashboard**: al primo accesso Matriosga legge la struttura (tabelle, colonne, PK, FK, indici) dai cataloghi `sys.*` e la salva in `storage/cache/`.
-3. Quando la struttura del DB cambia, premere **Aggiorna metadata** (in alto a destra).
-
-## 7. Controllo dell'ambiente e installazione su un'altra macchina
-
-Menu **Impostazioni → Ambiente server** controlla da solo PHP, driver SQL Server, OPcache, memoria,
-compressione, permessi di `storage` e, per ogni voce da sistemare, mostra i passi e le righe da copiare
-nei file di configurazione (con il percorso esatto di `php.ini` sulla macchina in uso). La Dashboard
-avvisa se qualcosa non va.
-
-Per spostare Matriosga su un'altra VM:
-
-1. Installare XAMPP (PHP 8.2, 64 bit) e *Microsoft ODBC Driver 18 for SQL Server* (x64).
-2. Copiare la cartella in `xampp\htdocs\` (`storage\cache` può restare vuota).
-3. Per portare la connessione copiare `storage\settings.json`, `storage\secrets.json` **e** `app.key`; altrimenti copiare solo `settings.json` e reinserire la password.
-4. Avviare Apache, aprire Impostazioni → Ambiente server e sistemare prima le voci rosse, poi le gialle.
-5. Testa connessione (il server SQL deve essere raggiungibile dalla nuova VM), poi aprire la Dashboard.
-
-Consigliati per la velocità: **OPcache** (in `php.ini`) e **mod_deflate** (in `httpd.conf`).
-
-## Struttura del progetto
-
-Vedi `docs/ARCHITETTURA.md`. Avanzamento lavori in `docs/ROADMAP.md`. Regole di sviluppo in `CLAUDE.md`.
-
-Log tecnici: `storage/logs/app-AAAA-MM-GG.log` (errori, query lente, aggiornamenti metadata; mai password).
+- Architettura e scelte tecniche: `docs/ARCHITETTURA.md`
+- Avanzamento e note: `docs/ROADMAP.md`
+- Regole (MVC, DRY, sola lettura, offline): `CLAUDE.md`
+- Librerie locali in `public/assets/vendor/` (Bootstrap 5, Font Awesome, Cytoscape.js), referenziate solo da
+  `config/assets.php`: per aggiornarne una basta sostituire il file o cambiare il percorso lì.
+- Log tecnici: `storage/logs/app-AAAA-MM-GG.log`.
